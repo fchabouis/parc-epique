@@ -118,14 +118,17 @@ export default {
   html,
   body,
   #app,
-  .application--wrap,
-  .content--wrap,
+  .application--wrap
   .content,
   .container {
     width: 100%;
     height: 100%;
   }
   
+  .content--wrap {
+    height: calc(100% - 48px);
+  }
+
   .container {
     padding: 0;
   }
