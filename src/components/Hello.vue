@@ -1,5 +1,5 @@
 <template>
-  <div style="height:100%; width: 100%;">
+  <div style="height: 100%;">
     <div id="map"></div>
 
     <v-snackbar v-model="snackbar">
@@ -24,7 +24,7 @@
             </v-btn>
             <v-tabs-slider color="black"></v-tabs-slider>
           </v-tabs-bar>
-          <v-tabs-items style="height:100%; overflow: auto;">
+          <v-tabs-items style="height: calc(100% - 48px); overflow: auto;">
 
             <v-tabs-content :key="tabs[0]" :id="tabs[0]" style="height:100%;">
               <v-card flat style="height:100%;">
@@ -46,37 +46,21 @@
                       </v-flex>
                     </v-layout>
                   </v-container>
-  
-                  <!-- <v-container>
-                    <v-divider></v-divider>
-                    <div>
-                      <h2>
-                        Aire gratuite
-                      </h2>
+
+                  <EditArea :equipmentsList="equipmentsList"></EditArea>
+
+                  <v-container>
+                    <div class="text-xs-center">
+                      <v-chip color="orange darken-3" text-color="white">toboggan</v-chip>
+                      <v-chip color="orange darken-3" text-color="white">bac à sable</v-chip>
+                      <v-chip color="orange darken-3" text-color="white">mur d'escalade</v-chip>
                     </div>
-                    <div>
-                      <h2>
-                        Ferme la nuit: oui
-                      </h2>
-                    </div>
-                    <div>
-                      <h2>
-                        Âges:
-                        <v-chip color="primary" text-color="white">0-3 ans</v-chip>
-                      </h2>
-                    </div>
-                    <div>
-                      <h2>
-                        Équipements:
-                        <v-chip color="primary" text-color="white">toboggan</v-chip>
-                      </h2>
-                    </div>
-                    </v-container> -->
+                    </v-container>
 
                     <v-container :grid-list-md="true">
                       <v-layout row wrap>
                         <v-flex
-                          xs6
+                          xs12
                           md4
                           v-for="(pic,i) in pictures"
                           :key="i"
@@ -84,7 +68,7 @@
                           <v-card flat tile>
                             <v-card-media
                               :src="pic.thumb"
-                              height="200px"
+                              height="250px"
                             >
                             </v-card-media>
                           </v-card>
@@ -186,6 +170,8 @@
   import L from 'leaflet'
   import * as firebase from 'firebase'
   import StarRating from 'vue-star-rating'
+  import GeoFire from 'geofire'
+  import EditArea from '@/components/EditArea'
   
   export default {
     data () {
@@ -204,17 +190,20 @@
         ratingEquipment: 0,
         comment: '',
         comments: [],
+        equipmentsList: ['toboggan', 'bac à sable'],
         sendingRating: false,
         uid: '',
         displayName: '',
         snackbar: false,
         snackbarMsg: '',
         uploadProgress: 0,
-        sendingPhoto: false
+        sendingPhoto: false,
+        loadingData: false
       }
     },
     components: {
-      StarRating
+      StarRating,
+      EditArea
     },
     computed: {
 
@@ -296,28 +285,30 @@
         })
 
         // upload pictures
-        let fileUpload = document.getElementById('cameraInput')
-        fileUpload.onchange = function (evt) {
-          if (vm.uid) {
-            let firstFile = evt.target.files[0] // get the first file uploaded
-            let storageRef = firebase.storage().ref('photos/' + vm.areaId + '/' + vm.areaId + '_' + vm.uid + '_' + Date.now())
-            let uploadTask = storageRef.put(firstFile)
-            vm.sendingPhoto = true
+        if (this.connected) {
+          let fileUpload = document.getElementById('cameraInput')
+          fileUpload.onchange = function (evt) {
+            if (vm.uid) {
+              let firstFile = evt.target.files[0] // get the first file uploaded
+              let storageRef = firebase.storage().ref('photos/' + vm.areaId + '/' + vm.areaId + '_' + vm.uid + '_' + Date.now())
+              let uploadTask = storageRef.put(firstFile)
+              vm.sendingPhoto = true
 
-            uploadTask.on('state_changed', function (snapshot) {
-              vm.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-              console.log(vm.uploadProgress)
-            }, function () {
-              vm.sendingPhoto = false
-              vm.snackbarMsg = 'Aie ! La photo n\'est pas partie :('
-              vm.snackbar = true
-              vm.uploadProgress = 0
-            }, function () {
-              vm.sendingPhoto = false
-              vm.snackbarMsg = 'Et une photo de plus !'
-              vm.snackbar = true
-              vm.uploadProgress = 0
-            })
+              uploadTask.on('state_changed', function (snapshot) {
+                vm.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                console.log(vm.uploadProgress)
+              }, function () {
+                vm.sendingPhoto = false
+                vm.snackbarMsg = 'Aie ! La photo n\'est pas partie :('
+                vm.snackbar = true
+                vm.uploadProgress = 0
+              }, function () {
+                vm.sendingPhoto = false
+                vm.snackbarMsg = 'Et une photo de plus !'
+                vm.snackbar = true
+                vm.uploadProgress = 0
+              })
+            }
           }
         }
       },
@@ -331,7 +322,9 @@
           displayName: vm.displayName,
           timestamp: Date.now()
         }).then(function (value) {
-          console.log('succes!')
+          let newuid = firebase.database().ref('/aires_enrichies/' + vm.areaId + '/uid_comments').push()
+          newuid.set(vm.uid)
+
           vm.sendingRating = false
           vm.snackbarMsg = 'C\'est dans la boite !'
           vm.snackbar = true
@@ -373,7 +366,7 @@
       let firstLoc = true
   
       if (L.Browser.mobile) {
-        map.locate()
+        map.locate({watch: true})
         map.on('zoomend', function () {
           metresPerPixel = cst / Math.pow(2, map.getZoom() + 8)
           markerAccuracy.setRadius(accuracy / metresPerPixel)
@@ -403,38 +396,87 @@
       if (!firebase.apps.length) {
         firebase.initializeApp(config)
       }
-  
-      let database = firebase.database()
 
-      let aires = database.ref('aires')
-  
-      aires.once('value', function (snapshot) {
-        let val = snapshot.val()
-        for (let a in val) {
-          let aire = val[a]
-          L.circleMarker([aire.lat, aire.lon], {
+      let markers = L.layerGroup().addTo(map)
+      let markersRef = {}
+
+      let database = firebase.database()
+      let aires = database.ref('aires_enrichies')
+
+      // geofire
+      let firebaseRef = firebase.database().ref('geofire')
+      let geofire = new GeoFire(firebaseRef)
+      let center = map.getCenter()
+
+      let geoQuery = geofire.query({
+        center: [center.lat, center.lng],
+        radius: 5
+      })
+
+      let areaCircle = L.circle([center.lat, center.lng], {radius: 5000, fillOpacity: 0, color: '#f9af02', opacity: 0.1, weight: 10}).addTo(map)
+
+      map.on('moveend', function () {
+        if (map.distance(map.getCenter(), center) > 4000) {
+          center = map.getCenter()
+          geoQuery.updateCriteria({
+            center: [center.lat, center.lng],
+            radius: 5
+          })
+          areaCircle.setLatLng([center.lat, center.lng]).addTo(map)
+        }
+      })
+
+      geoQuery.on('key_entered', function (key, location, distance) {
+        // vm.loadingData = true
+        aires.child(key).once('value', function (snapshot) {
+          let area = snapshot.val()
+          let uidComments = area.uid_comments
+          if (uidComments) {
+            console.log(area)
+          }
+          let marker = L.circleMarker([area.lat, area.lon], {
             stroke: false,
-            color: '#f9af02',
-            fillcolor: '#f9af02',
-            fillOpacity: 0.6,
-            radius: 10,
-            title: a
+            weight: 2,
+            color: 'blue',
+            fillColor: uidComments ? '#f9af02' : '#b7a786',
+            fillOpacity: uidComments ? 0.8 : 0.5,
+            radius: 10
           })
             .on('click', function (ev) {
               stop(ev)
-              vm.areaId = a
+              vm.areaId = key
               vm.sheet = true
               vm.fetchArea()
-              let areaPoint = map.latLngToLayerPoint([aire.lat, aire.lon], map.getZoom())
+              let areaPoint = map.latLngToLayerPoint([area.lat, area.lon], map.getZoom())
               setTimeout(function () {
                 let bh = document.getElementsByClassName('bottom-sheet dialog')[0].clientHeight
                 areaPoint = areaPoint.add([0, bh / 2])
                 let newCenter = map.layerPointToLatLng(areaPoint, map.getZoom())
                 map.panTo(newCenter)
               }, 500)
-            }).addTo(map)
-        }
+            })
+          markersRef[key] = marker
+          markers.addLayer(marker)
+        })
       })
+
+      geoQuery.on('key_exited', function (key, location, distance) {
+        markers.removeLayer(markersRef[key])
+      })
+
+      // GeoFire initialisation
+      // let firebaseRef = firebase.database().ref('geofire')
+      // let geofire = new GeoFire(firebaseRef)
+      // let aires = database.ref('aires')
+      // aires.once('value', function (snapshot) {
+      //   let val = snapshot.val()
+      //   for (let a in val) {
+      //     let aire = val[a]
+      //     geofire.set(a, [aire.lat, aire.lon]).then(function () {
+      //       console.log(a + ' initially set to [' + [aire.lat, aire.lon] + ']')
+      //     })
+      //   }
+      // })
 
       vm.checkConnection()
     }

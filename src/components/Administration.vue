@@ -30,11 +30,10 @@
           let c = snapshot.val()
           for (let area in c) {
             let users = Object.keys(c[area])
-            firebase.database().ref('/aires_enrichies/' + area).update({ uid_comments: users }).then(function (value) {
-              // console.log('Nouvelle rentrée avec succès')
-            }, function (reason) {
-              // console.log('echec!')
-            })
+            for (let user of users) {
+              let newuid = firebase.database().ref('/aires_enrichies/' + area + '/uid_comments').push()
+              newuid.set(user)
+            }
             console.log('Tous les commentaires ont été copiés dans les aires.')
           }
         })
