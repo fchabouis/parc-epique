@@ -6,6 +6,39 @@
       {{ snackbarMsg }}
       <v-btn flat color="pink" @click.native="snackbar = false">Close</v-btn>
     </v-snackbar>
+
+    <v-dialog
+      v-model="dialogEditArea"
+      transition="dialog-bottom-transition"
+      :overlay="false"
+      scrollable
+    >
+      <v-card>
+          <v-toolbar style="flex: 0 0 auto;" dark class="orange darken-2">
+          <v-btn icon @click.native="dialogEditArea = false" dark>
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Ajouter des détails à l'aire</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+            <v-container>
+              <div class="pt-3 pb-5 text-xs-center">
+                Super ! On dirait que vous souhaitez aider la communauté à en savoir plus sur cette aire ? Vous êtes au bon endroit.
+              </div>
+              <EditArea
+                @editSuccess="editSuccessActions"
+                :equipmentsList="equipmentsList"
+                :uid="uid"
+                :connected="connected"
+                :areaId="areaId"
+                :openAtNightP="openAtNight"
+                :freeAreaP="freeArea"
+                :privateAccessP="privateAccess">
+              </EditArea>
+            </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   
   
     <v-bottom-sheet v-model="sheet" class="dialog--fullscreen" id="bottomSheet">
@@ -46,16 +79,25 @@
                       </v-flex>
                     </v-layout>
                   </v-container>
-
-                  <EditArea :equipmentsList="equipmentsList"></EditArea>
-
+                  
                   <v-container>
                     <div class="text-xs-center">
-                      <v-chip color="orange darken-3" text-color="white">toboggan</v-chip>
-                      <v-chip color="orange darken-3" text-color="white">bac à sable</v-chip>
-                      <v-chip color="orange darken-3" text-color="white">mur d'escalade</v-chip>
+                      <div class="pb-1" v-if="freeArea != undefined">
+                        {{ freeArea ? 'Gratuite' : 'Payante' }}
+                      </div>
+                      <div class="pb-1" v-if="openAtNight != undefined">
+                        {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
+                      </div>
+                      <div class="pb-3" v-if="privateAccess != undefined">
+                        {{ privateAccess ? 'Non accessible au public' : 'Accessible au public' }}
+                      </div>
                     </div>
-                    </v-container>
+                      <div class="text-xs-center">
+                      <v-chip v-for='equipment in equipmentsList 'color="orange darken-3" text-color="white">{{ equipment }}</v-chip>
+                      <v-spacer></v-spacer>
+                      <v-btn color="secondary" flat @click.stop="dialogEditArea=true">Ajouter des détails</v-btn>
+                    </div>
+                  </v-container>
 
                     <v-container :grid-list-md="true">
                       <v-layout row wrap>
@@ -152,10 +194,6 @@
 
           </v-tabs-items>
         </v-tabs>
-  
-  
-  
-  
         <v-card-text text-center style="overflow-y: scroll;">
         </v-card-text>
   
@@ -190,7 +228,10 @@
         ratingEquipment: 0,
         comment: '',
         comments: [],
-        equipmentsList: ['toboggan', 'bac à sable'],
+        equipmentsList: [],
+        openAtNight: undefined,
+        freeArea: undefined,
+        privateAccess: undefined,
         sendingRating: false,
         uid: '',
         displayName: '',
@@ -198,7 +239,8 @@
         snackbarMsg: '',
         uploadProgress: 0,
         sendingPhoto: false,
-        loadingData: false
+        loadingData: false,
+        dialogEditArea: false
       }
     },
     components: {
@@ -209,6 +251,11 @@
 
     },
     methods: {
+      editSuccessActions () {
+        this.dialogEditArea = false
+        this.snackbarMsg = 'Merci, c\'est noté !'
+        this.snackbar = true
+      },
       takeAPhoto () {
         document.getElementById('cameraInput').click()
       },
@@ -254,6 +301,25 @@
           vm.averageRatingSurroundings = vm.average(vm.comments, 'ratingSurroundings')
           vm.averageRatingEquipment = vm.average(vm.comments, 'ratingEquipment')
         })
+
+        // equipment
+        let equipments = firebase.database().ref('/aires_infos/' + vm.areaId).orderByKey().limitToLast(1)
+        equipments.on('value', function (snapshot) {
+          let infos = snapshot.val()
+          if (infos) {
+            for (let i of Object.keys(infos)) {
+              vm.equipmentsList = infos[i].equipements.slice()
+              vm.openAtNight = infos[i].ouvertNuit
+              vm.freeArea = infos[i].gratuit
+              vm.privateAccess = infos[i].prive
+            }
+          } else {
+            vm.equipmentsList = []
+            vm.openAtNight = undefined
+            vm.freeArea = undefined
+            vm.privateAccess = undefined
+          }
+        })
   
         // carousel
         let pictures = firebase.database().ref('/images/' + vm.areaId)
@@ -296,7 +362,7 @@
 
               uploadTask.on('state_changed', function (snapshot) {
                 vm.uploadProgress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-                console.log(vm.uploadProgress)
+                // console.log(vm.uploadProgress)
               }, function () {
                 vm.sendingPhoto = false
                 vm.snackbarMsg = 'Aie ! La photo n\'est pas partie :('
@@ -431,9 +497,9 @@
         aires.child(key).once('value', function (snapshot) {
           let area = snapshot.val()
           let uidComments = area.uid_comments
-          if (uidComments) {
-            console.log(area)
-          }
+          // if (uidComments) {
+          //   console.log(area)
+          // }
           let marker = L.circleMarker([area.lat, area.lon], {
             stroke: false,
             weight: 2,

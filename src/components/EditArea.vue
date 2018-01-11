@@ -1,54 +1,122 @@
 <template>
-  <v-container>
-    <div class="text-xs-center">
-      <v-chip close color="orange darken-3" text-color="white" v-for="(e, i) in equipments" v-model="e.value"> {{ e.name }} </v-chip>
-          <v-select
-        v-bind:items="equipmentsDict"
-        v-model="newEquipment"
-        label="Ajouter un équipement"
-        autocomplete
-        clearable
-    ></v-select>
-    </div>
-    <v-layout row wrap>
-    <v-flex xs12 sm6>
+    <div class="">
+    <div v-if="connected">
+      <div v-if="!deleteArea">
+        <div class="pb-3">
+          L'aire est-elle :
+        </div>
+        <v-checkbox
+          color="orange darken-3"
+          label="Ouverte la nuit ?"
+          v-model="openAtNight"
+        ></v-checkbox>
+        <v-checkbox
+          color="orange darken-3"
+          label="Gratuite ?"
+          v-model="freeArea"
+        ></v-checkbox>
+        <v-checkbox
+          color="orange darken-3"
+          label="Non accessible au public (dans une école par exemple) ?"
+          v-model="privateAccess"
+        ></v-checkbox>
 
-    </v-flex>
-</v-layout>
-  </v-container>
+        <v-select
+          label="Équipement"
+          v-bind:items="equipmentsDict"
+          v-model="equipments"
+          multiple
+          chips
+          color="orange darken-3"
+          hint="Quels sont les équipements présents ?"
+          persistent-hint
+        ></v-select>
+      </div>
+      <v-checkbox
+        class="pt-5"
+        color="error"
+        label="Cette aire devrait être supprimée de la carte"
+        v-model="deleteArea"
+      ></v-checkbox>
+      <v-text-field
+        v-if="deleteArea"
+        color="error"
+        textarea
+        label="Dire en quelques mots pourquoi..."
+        v-model="deleteReason"
+      ></v-text-field>
+      <div class="pt-3 text-xs-center">
+        <v-btn color="orange darken-2" dark flat @click.stop="saveAreaInfos">Enregistrer</v-btn>
+      </div>
+    </div>
+    <div v-else>
+      <router-link to="/login" :key="$route.fullPath">Connectez-vous</router-link> pour contribuer.
+    </div>
+    </div>
 </template>
 
 <script>
+  import * as firebase from 'firebase'
+
   export default {
     data () {
       return {
         equipments: [],
+        openAtNight: this.openAtNightP || false,
+        freeArea: this.freeAreaP || false,
+        privateAccess: this.privateAccessP || false,
+        deleteArea: false,
+        deleteReason: '',
         equipmentsDict: [
           'bac à sable',
+          'cheval à bascule',
           'toboggan',
           'circuit de voitures',
           'escalade',
           'pont de singe',
           'cabane',
           'table de ping-pong'
-        ],
-        newEquipment: ''
+        ]
       }
     },
     watch: {
-      newEquipment () {
-        if (this.newEquipment) {
-          this.equipments.push({ name: this.newEquipment, value: true })
-          this.newEquipment = ''
-        }
+      openAtNightP () {
+        this.openAtNight = this.openAtNightP || false
+      },
+      freeAreaP () {
+        this.freeArea = this.freeAreaP || false
+      },
+      privateAccessP () {
+        this.privateAccess = this.privateAccessP || false
+      },
+      equipmentsList () {
+        this.equipments = this.equipmentsList.slice()
       }
     },
-    props: ['equipmentsList'],
+    props: ['equipmentsList', 'uid', 'areaId', 'openAtNightP', 'freeAreaP', 'privateAccessP', 'connected'],
     methods: {
-    },
-    mounted () {
-      for (let e of this.equipmentsList) {
-        this.equipments.push({ name: e, value: true })
+      saveAreaInfos () {
+        let vm = this
+        if (this.deleteArea) {
+          firebase.database().ref('/aires_suppression/' + vm.areaId).set({
+            raison: this.deleteReason,
+            uid: this.uid,
+            timestamp: Date.now()
+          }).then(function () {
+            vm.$emit('editSuccess')
+          })
+        } else {
+          let infos = {
+            equipements: this.equipments,
+            ouvertNuit: this.openAtNight,
+            gratuit: this.freeArea,
+            prive: this.privateAccess
+          }
+          let areaInfos = firebase.database().ref('/aires_infos/' + vm.areaId).push()
+          areaInfos.set(infos).then(function () {
+            vm.$emit('editSuccess')
+          })
+        }
       }
     }
   }
