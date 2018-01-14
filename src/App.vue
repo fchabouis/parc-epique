@@ -1,5 +1,10 @@
 <template>
   <v-app light>
+    <v-snackbar v-model="snackbar">
+      Bienvenue {{ displayName }} !
+      <v-btn flat color="pink" @click.native="snackbar = false">fermer</v-btn>
+    </v-snackbar>
+
     <v-navigation-drawer fixed v-model="drawer" app>
       <v-list>
         <div v-if="connected">
@@ -8,9 +13,7 @@
               <v-icon light>person</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <router-link to="/login" :key="$route.fullPath">
-                <v-list-tile-title>{{ displayName }}</v-list-tile-title>
-              </router-link>
+              <v-list-tile-title>{{ displayName }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile>
@@ -18,9 +21,7 @@
               <v-icon light>exit_to_app</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <router-link to="/login" :key="$route.fullPath">
-                <v-list-tile-title @click="signout()">Se déconnecter</v-list-tile-title>
-              </router-link>
+              <v-list-tile-title @click="signout()" style="cursor: pointer;">Se déconnecter</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </div>
@@ -80,7 +81,8 @@ export default {
       title: 'Aires de jeux',
       connected: false,
       displayName: '',
-      uid: ''
+      uid: '',
+      snackbar: false
     }
   },
   methods: {
@@ -91,6 +93,7 @@ export default {
           vm.connected = true
           vm.displayName = user.displayName
           vm.uid = user.uid
+          vm.snackbar = true
         } else {
           vm.connected = false
           vm.displayName = ''
