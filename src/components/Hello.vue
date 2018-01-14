@@ -1,5 +1,6 @@
 <template>
   <div style="height: 100%;">
+
     <div id="map"></div>
 
     <v-snackbar v-model="snackbar">
@@ -51,9 +52,6 @@
         </v-toolbar>
         <v-card-text>
           <v-container>
-            <div class="pt-3 pb-5 text-xs-center">
-              Super ! On dirait que vous souhaitez aider la communauté à en savoir plus sur cette aire ? Vous êtes au bon endroit.
-            </div>
             <EditArea @editSuccess="editSuccessActions" :equipmentsList="equipmentsList" :uid="uid" :connected="connected" :areaId="areaId" :openAtNightP="openAtNight" :freeAreaP="freeArea" :privateAccessP="privateAccess">
             </EditArea>
           </v-container>
@@ -82,7 +80,6 @@
             <v-tabs-content :key="tabs[0]" :id="tabs[0]" style="height:100%;">
               <v-card flat style="height:100%;">
                 <v-card-text>
-
                   <v-container grid-list-md text-xs-center>
                     <v-layout row wrap>
                       <v-flex md6>
@@ -139,23 +136,26 @@
                   </v-container>
 
                   <v-container>
-                    <h2> Avis des utilisateurs</h2>
-                    <div v-for="(c,i) in comments" :key="i">
-                      <div v-if="c.comment" class="pt-3">
-
-                        <h4>
-                          {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
-                          <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
-                          Équipement
-                          <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
-                        </h4>
-                        <p>
-                          {{ c.comment }}
-                        </p>
-                        <v-divider></v-divider>
+                    <h2>Avis des utilisateurs</h2>
+                    <div v-if="!comments">
+                      Pas encore d'avis déposé.
+                    </div>
+                    <div v-else>
+                      <div v-for="(c,i) in comments" :key="i">
+                        <div v-if="c.comment" class="pt-3">
+                          <h4>
+                            {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
+                            <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                            Équipement
+                            <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                          </h4>
+                          <p>
+                            {{ c.comment }}
+                          </p>
+                          <v-divider></v-divider>
+                        </div>
                       </div>
                     </div>
-
                     <div style="margin-bottom: 100px;">
                     </div>
                   </v-container>
