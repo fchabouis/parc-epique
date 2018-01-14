@@ -69,7 +69,7 @@
             <v-btn icon @click.native="sheet = false">
               <v-icon>close</v-icon>
             </v-btn>
-            <v-tabs-item v-for="tab in tabs" :key="tab" :href="'#' + tab" ripple>
+            <v-tabs-item v-for="tab in tabs" :key="tab" :id="'tabTitle_' + tab" :href="'#' + tab" ripple>
               {{ tab }}
             </v-tabs-item>
             <v-btn flat @click.native="seeMore = true">
@@ -314,6 +314,9 @@ export default {
     },
     fetchArea() {
       let vm = this
+
+      // work around vuetify bug with tabs slider not showing if initially hidden
+      document.getElementById('tabTitle_' + vm.tabs[0]).firstChild.click()
 
       // average rating
       let comments = firebase.database().ref('/comments/' + vm.areaId)
