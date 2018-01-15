@@ -26,7 +26,7 @@
           </v-list-tile>
         </div>
         <div v-else>
-          <v-list-tile value="true">
+          <v-list-tile>
             <v-list-tile-action>
               <v-icon light>person</v-icon>
             </v-list-tile-action>
