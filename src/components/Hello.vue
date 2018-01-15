@@ -128,10 +128,12 @@
                     </v-layout>
                     <div class="text-xs-center">
                       <input type="file" accept="image/*" id="cameraInput">
-                      <v-btn @click="takeAPhoto" :value="uploadProgress" :loading="sendingPhoto" :disabled="sendingPhoto">photo
+                      <v-btn @click="takeAPhoto">photo
                         <v-icon>add_a_photo</v-icon>
                       </v-btn>
-                      <v-progress-linear v-if="uploadProgress" v-bind:value="uploadProgress"></v-progress-linear>
+                      <div v-for="(ts,progress) in Object.keys(uploadProgress)">
+                        <v-progress-linear color="orange" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
+                      </div>
                     </div>
                   </v-container>
 
@@ -252,8 +254,7 @@ export default {
       displayName: '',
       snackbar: false,
       snackbarMsg: '',
-      uploadProgress: 0,
-      sendingPhoto: false,
+      uploadProgress: {},
       loadingData: false,
       dialogEditArea: false,
       dialogAddArea: false,
@@ -384,29 +385,31 @@ export default {
         fileUpload.onchange = function(evt) {
           if (vm.uid) {
             let firstFile = evt.target.files[0] // get the first file uploaded
+            let ts = Date.now()
             let storageRef = firebase
               .storage()
-              .ref('photos/' + vm.areaId + '/' + vm.areaId + '_' + vm.uid + '_' + Date.now())
+              .ref('photos/' + vm.areaId + '/' + vm.areaId + '_' + vm.uid + '_' + ts)
             let uploadTask = storageRef.put(firstFile)
-            vm.sendingPhoto = true
 
             uploadTask.on(
               'state_changed',
               function(snapshot) {
-                vm.uploadProgress = snapshot.bytesTransferred / snapshot.totalBytes * 100
+                vm.$set(
+                  vm.uploadProgress,
+                  ts,
+                  snapshot.bytesTransferred / snapshot.totalBytes * 100
+                )
                 // console.log(vm.uploadProgress)
               },
               function() {
-                vm.sendingPhoto = false
                 vm.snackbarMsg = "Aie ! La photo n'est pas partie :("
                 vm.snackbar = true
-                vm.uploadProgress = 0
+                vm.$set(vm.uploadProgress, ts, 0)
               },
               function() {
-                vm.sendingPhoto = false
                 vm.snackbarMsg = 'Et une photo de plus !'
                 vm.snackbar = true
-                vm.uploadProgress = 0
+                vm.$set(vm.uploadProgress, ts, 0)
               }
             )
           }
