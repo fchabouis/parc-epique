@@ -5,7 +5,7 @@
 
     <v-snackbar v-model="snackbar">
       {{ snackbarMsg }}
-      <v-btn flat color="pink" @click.native="snackbar = false">fermer</v-btn>
+      <v-btn flat color="orange" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
 
     <v-dialog v-model="dialogAddArea" transition="dialog-bottom-transition" :overlay="false" max-width="290">
@@ -63,7 +63,7 @@
       <v-card style="height: 100%">
         <v-tabs v-model="tabActive" grow style="height:100%;">
 
-          <v-tabs-bar class="amber lighten-3">
+          <v-tabs-bar class="orange darken-1" dark>
             <v-btn icon @click.native="sheet = false">
               <v-icon>close</v-icon>
             </v-btn>
