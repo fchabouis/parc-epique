@@ -37,20 +37,40 @@
             </v-list-tile-content>
           </v-list-tile>
         </div>
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon light>question_answer</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <router-link to="/aide">
+              <v-list-tile-title>A propos & aide </v-list-tile-title>
+            </router-link>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon light>layers</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <router-link to="/">
+              <v-list-tile-title>Carte</v-list-tile-title>
+            </router-link>
+          </v-list-tile-content>
+        </v-list-tile>
+
       </v-list>
     </v-navigation-drawer>
-  
-  
+
     <v-toolbar dense dark app class="orange darken-2">
       <v-toolbar-side-icon @click.stop="drawer = !drawer" dark></v-toolbar-side-icon>
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
-  
+
     <v-content>
       <router-view></router-view>
     </v-content>
-  
+
   </v-app>
 </template>
 
