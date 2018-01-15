@@ -71,13 +71,15 @@ if (!firebase.apps.length) {
 }
 
 export default {
-  data () {
+  data() {
     return {
       drawer: false,
-      items: [{
-        icon: 'bubble_chart',
-        title: 'Se connecter / créer un compte'
-      }],
+      items: [
+        {
+          icon: 'bubble_chart',
+          title: 'Se connecter / créer un compte'
+        }
+      ],
       title: 'Aires de jeux',
       connected: false,
       displayName: '',
@@ -86,53 +88,58 @@ export default {
     }
   },
   methods: {
-    checkConnection () {
+    checkConnection() {
       let vm = this
-      firebase.auth().onAuthStateChanged(function (user) {
-        if (user) {
-          vm.connected = true
-          vm.displayName = user.displayName
-          vm.uid = user.uid
-          vm.snackbar = true
-        } else {
-          vm.connected = false
-          vm.displayName = ''
-          vm.uid = ''
+      firebase.auth().onAuthStateChanged(
+        function(user) {
+          if (user) {
+            vm.connected = true
+            vm.displayName = user.displayName
+            vm.uid = user.uid
+            vm.snackbar = true
+          } else {
+            vm.connected = false
+            vm.displayName = ''
+            vm.uid = ''
+          }
+        },
+        function(error) {
+          console.log(error)
         }
-      }, function (error) {
-        console.log(error)
-      })
+      )
     },
-    signout () {
+    signout() {
       let vm = this
-      firebase.auth().signOut().then(function () {
-        vm.displayName = ''
-        vm.connected = false
-      })
+      firebase
+        .auth()
+        .signOut()
+        .then(function() {
+          vm.displayName = ''
+          vm.connected = false
+        })
     }
   },
-  mounted () {
+  mounted() {
     this.checkConnection()
   }
 }
 </script>
 
 <style>
-  html,
-  body,
-  #app,
-  .application--wrap
-  .content,
-  .container {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .content--wrap {
-    height: calc(100% - 48px);
-  }
+html,
+body,
+#app,
+.application--wrap .content,
+.container {
+  width: 100%;
+  height: 100%;
+}
 
-  .container {
-    padding: 0;
-  }
+.content--wrap {
+  height: calc(100% - 48px);
+}
+
+.container {
+  padding: 0;
+}
 </style>
