@@ -2,7 +2,7 @@
   <v-app light>
     <v-snackbar v-model="snackbar">
       Bienvenue {{ displayName }} !
-      <v-btn flat color="pink" @click.native="snackbar = false">fermer</v-btn>
+      <v-btn flat color="orange" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
 
     <v-navigation-drawer fixed v-model="drawer" app>
