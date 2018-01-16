@@ -1,10 +1,10 @@
 <template>
   <!-- if you want automatic padding use "layout-padding" class -->
-  <div class="layout-padding">
+  <v-container style="padding: 10px;">
     <h2>Aires de jeux</h2>
     <p>Pour participer, créez un compte. Cela prend environ 30 secondes.</p>
     <div id="firebaseui-auth-container"></div>
-  </div>
+  </v-container>
 </template>
 
 <script>
