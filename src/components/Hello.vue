@@ -144,7 +144,7 @@
                     </div>
                     <div v-else>
                       <div v-for="(c,i) in comments" :key="i">
-                        <div v-if="c.comment" class="pt-3">
+                        <div class="pt-3">
                           <h4>
                             {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
                             <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
