@@ -1,11 +1,43 @@
 <template>
   <div>
+    <v-snackbar :color=snackbarColor v-model="snackbar">
+      {{ snackbarMsg }}
+      <v-btn color="orange" flat @click.native="snackbar = false">fermer</v-btn>
+    </v-snackbar>
+
     <v-container>
       <h1>Outils d'administration</h1>
       <v-btn @click="DeleteAreasEnriched">Supprimer les aires enrichies</v-btn>
       <v-btn @click="copyAires" :loading="copyingAreas">Copier les aires</v-btn>
       <v-btn @click="copyComments">Copier les commentaires</v-btn>
       <v-btn @click="downloadDB">Créer dump base</v-btn>
+      <h1 class="pt-5">Validation</h1>
+      <v-btn @click="lookForNewActivity">Chercher activité non vérifiée</v-btn>
+      <v-select v-bind:items="areasList" v-model="areaValidation" label="Aires" single-line bottom></v-select>
+
+      <ul>
+        <span v-for="(v, k) in details">
+          <h4>
+            {{ k }}
+          </h4>
+          <span v-for="(val, key) in v">
+            <span v-if="key == 'validationPath'">
+              <v-btn @click="validate(val)">Valider</v-btn>
+              <v-btn @click="reject(val)">Rejeter</v-btn>
+            </span>
+            <li v-else-if="key == 'thumbnail'">
+              <img :src="val">
+            </li>
+            <li v-else>
+              {{ key }} : {{ val }}
+            </li>
+          </span>
+
+          <div class="pb-3"></div>
+        </span>
+      </ul>
+      <div id="mapAdmin"></div>
+
     </v-container>
   </div>
 </template>
@@ -13,16 +45,161 @@
 <script>
 import * as firebase from 'firebase'
 import GeoFire from 'geofire'
+import L from 'leaflet'
 
 export default {
   data() {
     return {
-      copyingAreas: false
+      copyingAreas: false,
+      areaNeedingValidation: {},
+      areaValidation: '',
+      map: {},
+      snackbar: false,
+      snackbarMsg: '',
+      snackbarColor: 'green'
     }
   },
   components: {},
-  computed: {},
+  computed: {
+    areasList() {
+      return Object.keys(this.areaNeedingValidation)
+    },
+    details() {
+      return this.areaNeedingValidation[this.areaValidation]
+    }
+  },
+  watch: {
+    areaValidation() {
+      console.log('area has changed')
+      let latlng = [this.details.coordonnees.lat, this.details.coordonnees.lon]
+      if ('remove' in this.map) {
+        this.map.remove()
+      }
+      this.map = L.map('mapAdmin', {}).setView(latlng, 15)
+      L.tileLayer(
+        'https://api.mapbox.com/styles/v1/istopopoki/cj9ydd0jg7it52sp7pubunya6/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXN0b3BvcG9raSIsImEiOiJjaW12eWw2ZHMwMGFxdzVtMWZ5NHcwOHJ4In0.VvZvyvK0UaxbFiAtak7aVw',
+        {
+          attribution:
+            'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+        }
+      ).addTo(this.map)
+      L.marker(latlng).addTo(this.map)
+    }
+  },
   methods: {
+    reject(rejectPath) {
+      let vm = this
+      let path = '/'
+      for (let item of rejectPath) {
+        path += item + '/'
+      }
+      firebase
+        .database()
+        .ref(path)
+        .remove()
+        .then(function() {
+          vm.snackbarColor = 'red'
+          vm.snackbarMsg = 'contribution rejetée'
+          vm.snackbar = true
+        })
+      vm.lookForNewActivity()
+    },
+    validate(validationPath) {
+      let vm = this
+      let path = '/'
+      for (let item of validationPath) {
+        path += item + '/'
+      }
+      firebase
+        .database()
+        .ref(path)
+        .update({ validated: true })
+        .then(function() {
+          vm.snackbarColor = 'green'
+          vm.snackbarMsg = 'contribution validée'
+          vm.snackbar = true
+        })
+      vm.lookForNewActivity()
+    },
+    lookForNewActivity() {
+      let vm = this
+      vm.areaNeedingValidation = {}
+
+      // get comments
+      let comments = firebase.database().ref('/comments/')
+      comments.once('value', function(snapshot) {
+        let c = snapshot.val()
+        for (let area in c) {
+          let users = Object.keys(c[area])
+          for (let user of users) {
+            // console.log(c[area][user])
+            if (!('validated' in c[area][user])) {
+              let contenu = c[area][user]
+              contenu.uid = user
+              contenu.validationPath = ['comments', area, user]
+              vm.$set(vm.areaNeedingValidation, area, {
+                commentaire: contenu
+              })
+            }
+          }
+        }
+      })
+
+      // get aires infos
+      let infos = firebase.database().ref('/aires_infos/')
+      infos.once('value', function(snapshot) {
+        let i = snapshot.val()
+        for (let area in i) {
+          // console.log(area)
+          let changes = i[area]
+          // console.log(changes)
+          for (let change in changes) {
+            // console.log(change)
+            if (!('validated' in changes[change])) {
+              let areaContent = vm.areaNeedingValidation[area] || {}
+              areaContent['infos ' + change] = i[area][change]
+              areaContent['infos ' + change].validationPath = ['aires_infos', area, change]
+              vm.$set(vm.areaNeedingValidation, area, areaContent)
+            }
+          }
+        }
+      })
+
+      let images = firebase.database().ref('/images/')
+      images
+        .once('value', function(snapshot) {
+          let i = snapshot.val()
+          for (let area in i) {
+            // console.log(area)
+            let images = Object.keys(i[area])
+            for (let image of images) {
+              // console.log(i[area][image])
+              if (!('validated' in i[area][image])) {
+                let areaContent = vm.areaNeedingValidation[area] || {}
+                areaContent['image ' + image] = { thumbnail: i[area][image].thumbnail }
+                areaContent['image ' + image].validationPath = ['images', area, image]
+                vm.$set(vm.areaNeedingValidation, area, areaContent)
+              }
+            }
+          }
+        })
+        .then(function() {
+          for (let area of vm.areasList) {
+            // console.log(area)
+            let areaf = firebase.database().ref('/aires_enrichies/' + area)
+            areaf.once('value', function(snapshot) {
+              let a = snapshot.val()
+              // console.log(a)
+              if (a) {
+                let areaContent = vm.areaNeedingValidation[area] || {}
+                areaContent.coordonnees = { lat: a.lat, lon: a.lon }
+                // console.log(areaContent)
+                vm.$set(vm.areaNeedingValidation, area, areaContent)
+              }
+            })
+          }
+        })
+    },
     downloadDB() {
       function download(text, name, type) {
         let a = document.createElement('a')
@@ -138,5 +315,8 @@ export default {
 </script>
 
 <style>
-
+#mapAdmin {
+  height: 400px;
+  z-index: 0;
+}
 </style>
