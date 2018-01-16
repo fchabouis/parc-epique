@@ -47,7 +47,9 @@ export default {
         'escalade',
         'pont de singe',
         'cabane',
-        'table de ping-pong'
+        'table de ping-pong',
+        'fontaine',
+        'toilettes'
       ]
     }
   },
