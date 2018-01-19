@@ -149,14 +149,19 @@ export default {
 html,
 body,
 #app,
-.application--wrap .content,
-.container {
+.application--wrap,
+.content {
   width: 100%;
   height: 100%;
 }
 
+.application--wrap {
+  min-height: 100%;
+}
+
 .content--wrap {
   height: calc(100% - 48px);
+  height: -webkit-calc(100% - 48px);
 }
 
 .container {
