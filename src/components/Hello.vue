@@ -126,15 +126,6 @@
                         </v-card>
                       </v-flex>
                     </v-layout>
-                    <div class="text-xs-center">
-                      <input type="file" accept="image/*" id="cameraInput">
-                      <v-btn @click="takeAPhoto">photo
-                        <v-icon>add_a_photo</v-icon>
-                      </v-btn>
-                      <div v-for="(ts,progress) in Object.keys(uploadProgress)">
-                        <v-progress-linear color="orange" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
-                      </div>
-                    </div>
                   </v-container>
 
                   <v-container>
@@ -172,6 +163,9 @@
                   <div v-if="connected">
 
                     <v-container grid-list-md text-xs-center>
+                      <div v-if="!comments">
+                        Pas encore d'avis, soyez le premier à déposer le vôtre.
+                      </div>
                       <v-layout row wrap>
                         <v-flex md6>
                           <h2>
@@ -186,6 +180,16 @@
                           <star-rating v-model="ratingEquipment" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
                         </v-flex>
                       </v-layout>
+
+                      <div class="text-xs-center">
+                        <input type="file" accept="image/*" id="cameraInput">
+                        <v-btn @click="takeAPhoto">photo
+                          <v-icon>add_a_photo</v-icon>
+                        </v-btn>
+                        <div v-for="(ts,progress) in Object.keys(uploadProgress)">
+                          <v-progress-linear color="orange" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
+                        </div>
+                      </div>
 
                       <v-text-field textarea label="Commentaire" v-model="comment"></v-text-field>
 
@@ -315,6 +319,14 @@ export default {
     },
     fetchArea() {
       let vm = this
+      vm.comments = []
+      vm.averageRatingSurroundings = 0
+      vm.averageRatingEquipment = 0
+      vm.equipmentsList = []
+      vm.openAtNight = undefined
+      vm.freeArea = undefined
+      vm.privateAccess = undefined
+      vm.pictures = []
 
       // work around vuetify bug with tabs slider not showing if initially hidden
       document.getElementById('tabTitle_' + vm.tabs[0]).firstChild.click()
@@ -325,6 +337,7 @@ export default {
         vm.comments = snapshot.val()
         vm.averageRatingSurroundings = vm.average(vm.comments, 'ratingSurroundings')
         vm.averageRatingEquipment = vm.average(vm.comments, 'ratingEquipment')
+        vm.tabActive = vm.comments ? vm.tabs[0] : vm.tabs[1]
       })
 
       // equipment
