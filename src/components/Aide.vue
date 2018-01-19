@@ -19,7 +19,11 @@
                 Pour ceux que cela intéresse, le code du projet est libre et est publié sur github.
             </p>
 
-            <h1 class="pt-5">FAQ</h1>
+            <div class="text-xs-center pt-5">
+                <img src="static/img/aires_logo_couleur2.png" height="250px">
+            </div>
+
+            <h1 class="">FAQ</h1>
             <p class="pt-4 title">
                 Comment puis-je participer ?
             </p>
@@ -38,7 +42,6 @@
             <p>
                 Francis Chabouis. Je suis un ingénieur et développeur freelance à Paris avec un petit faible pour les cartes.
             </p>
-
         </v-container>
     </div>
 </template>
