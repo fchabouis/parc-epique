@@ -11,7 +11,22 @@
       <v-btn @click="copyAires" :loading="copyingAreas">Copier les aires</v-btn>
       <v-btn @click="copyComments">Copier les commentaires</v-btn>
       <v-btn @click="downloadDB">Créer dump base</v-btn>
-      <h1 class="pt-5">Validation</h1>
+
+      <h1 class="pt-5">Nouvelles aires</h1>
+      <v-btn @click="lookForNewArea">Chercher nouvelles aires</v-btn>
+      <v-select v-bind:items="newAreasList" v-model="newArea" label="Nouvelles Aires" single-line bottom></v-select>
+
+      <p>
+        <ul>
+          <li v-for="(v, k) in newAreaDetails">
+            {{ k }} : {{ v }}
+          </li>
+          <v-btn v-if="newAreaDetails" @click="validateNewArea">Valider nouvelle aire</v-btn>
+          <v-btn v-if="newAreaDetails" @click="RejectNewArea">Rejeter nouvelle aire</v-btn>
+
+        </ul>
+      </p>
+      <h1 class="pt-5">Validation de commentaires</h1>
       <v-btn @click="lookForNewActivity">Chercher activité non vérifiée</v-btn>
       <v-select v-bind:items="areasList" v-model="areaValidation" label="Aires" single-line bottom></v-select>
 
@@ -56,7 +71,9 @@ export default {
       map: {},
       snackbar: false,
       snackbarMsg: '',
-      snackbarColor: 'green'
+      snackbarColor: 'green',
+      newAreas: {},
+      newArea: ''
     }
   },
   components: {},
@@ -66,12 +83,24 @@ export default {
     },
     details() {
       return this.areaNeedingValidation[this.areaValidation]
+    },
+    newAreasList() {
+      return Object.keys(this.newAreas)
+    },
+    newAreaDetails() {
+      return this.newAreas[this.newArea]
     }
   },
   watch: {
+    newArea() {
+      this.showMap([this.newAreas[this.newArea].lat, this.newAreas[this.newArea].lon])
+    },
     areaValidation() {
-      console.log('area has changed')
-      let latlng = [this.details.coordonnees.lat, this.details.coordonnees.lon]
+      this.showMap([this.details.coordonnees.lat, this.details.coordonnees.lon])
+    }
+  },
+  methods: {
+    showMap(latlng) {
       if ('remove' in this.map) {
         this.map.remove()
       }
@@ -84,9 +113,53 @@ export default {
         }
       ).addTo(this.map)
       L.marker(latlng).addTo(this.map)
-    }
-  },
-  methods: {
+    },
+    lookForNewArea() {
+      let vm = this
+      this.newAreas = {}
+
+      firebase
+        .database()
+        .ref('/nouvelle_aire/')
+        .once('value', function(snapshot) {
+          let na = snapshot.val()
+          for (let area in na) {
+            // console.log(area)
+            let details = na[area]
+            if (!('validated' in details)) {
+              vm.$set(vm.newAreas, area, details)
+            }
+          }
+        })
+    },
+    validateNewArea() {
+      let vm = this
+      firebase
+        .database()
+        .ref('/nouvelle_aire/' + vm.newArea)
+        .update({ validated: true })
+        .then(function() {
+          vm.snackbarColor = 'green'
+          vm.snackbarMsg = 'nouvelle aire validée'
+          vm.snackbar = true
+        })
+    },
+    RejectNewArea() {
+      let vm = this
+      firebase
+        .database()
+        .ref('/nouvelle_aire/' + vm.newArea)
+        .remove()
+        .then(function() {
+          firebase
+            .database()
+            .ref('/aires_enrichies/' + vm.newArea)
+            .remove()
+          vm.snackbarColor = 'red'
+          vm.snackbarMsg = 'nouvelle aire rejetée'
+          vm.snackbar = true
+        })
+    },
     reject(rejectPath) {
       let vm = this
       let path = '/'
