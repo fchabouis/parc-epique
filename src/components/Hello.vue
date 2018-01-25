@@ -95,6 +95,8 @@
                         <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
                       </v-flex>
                     </v-layout>
+                    <span v-if="dist">à {{ dist }} mètres</span>
+                    <v-icon v-if="direction" large color="orange darken-2" :style="{transform: 'rotate(' + direction + 'deg)'}">forward</v-icon>
                   </v-container>
 
                   <v-container>
@@ -266,14 +268,44 @@ export default {
       dialogConfirmArea: false,
       newAreaLatLng: [],
       marker: {},
-      geofire: {}
+      geofire: {},
+      position: [],
+      areaPosition: [],
+      deviceDirection: 0
     }
   },
   components: {
     StarRating,
     EditArea
   },
-  computed: {},
+  computed: {
+    dist() {
+      try {
+        return Math.round(this.map.distance(this.position, this.areaPosition))
+      } catch (error) {
+        return 0
+      }
+    },
+    direction() {
+      try {
+        let dy = this.areaPosition[0] - this.position[0]
+        let dx = this.areaPosition[1] - this.position[1]
+        let atan = Math.atan(dx / dy)
+        let a
+        if (dx >= 0 && dy >= 0) {
+          a = 2 * Math.PI - atan
+        } else if (dx <= 0 && dy >= 0) {
+          a = -atan
+        } else {
+          a = Math.PI - atan
+        }
+        this.AD = 180 * a / Math.PI
+        return -180 * a / Math.PI + this.deviceDirection - 90
+      } catch (error) {
+        return 0
+      }
+    }
+  },
   methods: {
     editSuccessActions() {
       this.dialogEditArea = false
@@ -574,19 +606,25 @@ export default {
           markerAccuracy.setRadius(accuracy / metresPerPixel)
         })
         .on('locationfound', function(evt) {
+          vm.position = [evt.latitude, evt.longitude]
           metresPerPixel =
             40075016.686 *
             Math.abs(Math.cos(map.getCenter().lat * 180 / Math.PI)) /
             Math.pow(2, map.getZoom() + 8)
           accuracy = evt.accuracy
           markerAccuracy.setRadius(accuracy / metresPerPixel)
-          markerAccuracy.setLatLng([evt.latitude, evt.longitude]).addTo(map)
-          markerPosition.setLatLng([evt.latitude, evt.longitude]).addTo(map)
+          markerAccuracy.setLatLng(vm.position).addTo(map)
+          markerPosition.setLatLng(vm.position).addTo(map)
           if (firstLoc) {
-            map.flyTo([evt.latitude, evt.longitude], 15)
+            map.flyTo(vm.position, 15)
             firstLoc = false
           }
         })
+      if ('ondeviceorientationabsolute' in window) {
+        window.addEventListener('deviceorientationabsolute', function(eventData) {
+          vm.deviceDirection = eventData.alpha
+        })
+      }
     }
 
     // Initialize Firebase
@@ -664,8 +702,9 @@ export default {
           stop(ev)
           vm.areaId = key
           vm.sheet = true
+          vm.areaPosition = [area.lat, area.lon]
           vm.fetchArea()
-          let areaPoint = map.latLngToLayerPoint([area.lat, area.lon], map.getZoom())
+          let areaPoint = map.latLngToLayerPoint(vm.areaPosition, map.getZoom())
           setTimeout(function() {
             let bh = document.getElementsByClassName('bottom-sheet dialog')[0].clientHeight
             areaPoint = areaPoint.add([0, bh / 2])
