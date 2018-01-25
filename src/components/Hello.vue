@@ -59,7 +59,7 @@
       </v-card>
     </v-dialog>
 
-    <v-bottom-sheet v-model="sheet" class="dialog--fullscreen" id="bottomSheet">
+    <v-bottom-sheet v-model="sheet" id="bottomSheet">
       <v-card style="height: 100%">
         <v-tabs v-model="tabActive" grow style="height:100%;">
 
@@ -697,6 +697,8 @@ export default {
   /* overflow: auto; */
   position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
   height: 50%;
 }
 
