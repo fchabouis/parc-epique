@@ -121,7 +121,8 @@
                     <v-layout row wrap>
                       <v-flex xs12 md4 v-for="(pic,i) in pictures" :key="i">
                         <v-card flat tile>
-                          <v-card-media :src="pic.thumb" height="250px">
+                          <v-card-media>
+                            <a :href="pic.src" target="_blank"><img :src="pic.thumb" style="width: 100%"></a>
                           </v-card-media>
                         </v-card>
                       </v-flex>
