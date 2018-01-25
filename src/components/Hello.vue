@@ -481,7 +481,7 @@ export default {
     pushArea() {
       let vm = this
       let timestamp = Date.now()
-      let name = 'aire_' + timestamp
+      let name = 'aire-' + timestamp
       let lat = vm.marker.getLatLng().lat
       let lng = vm.marker.getLatLng().lng
       let error = false
