@@ -289,7 +289,7 @@ export default {
       db
         .once('value', function(snapshot) {
           let data = snapshot.val()
-          download(JSON.stringify(data), 'airesdejeux_bkp.txt', 'text/plain')
+          download(JSON.stringify(data), 'airesdejeux_bkp_' + Date.now() + '.json', 'text/plain')
         })
         .then(function() {
           console.log('succès')
