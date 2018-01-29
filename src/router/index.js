@@ -7,15 +7,20 @@ import Aide from '@/components/Aide'
 
 Vue.use(Router)
 
+let routes = [
+  {
+    path: '/',
+    name: 'Hello',
+    component: Hello
+  },
+  { path: '/login', component: Login, props: true },
+  { path: '/aide', component: Aide }
+]
+
+if (process.env.NODE_ENV !== 'production') {
+  routes.push({ path: '/administration', component: Administration })
+}
+
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Hello',
-      component: Hello
-    },
-    { path: '/login', component: Login, props: true },
-    { path: '/administration', component: Administration },
-    { path: '/aide', component: Aide }
-  ]
+  routes: routes
 })
