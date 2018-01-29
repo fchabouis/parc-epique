@@ -96,7 +96,7 @@
                       </v-flex>
                     </v-layout>
                     <span v-if="dist">à {{ dist }} mètres</span>
-                    <v-icon v-if="direction" large color="orange darken-2" :style="{transform: 'rotate(' + direction + 'deg)'}">forward</v-icon>
+                    <!-- <v-icon v-if="direction" large color="orange darken-2" :style="{transform: 'rotate(' + direction + 'deg)'}">forward</v-icon> -->
                   </v-container>
 
                   <v-container>
@@ -280,31 +280,39 @@ export default {
   },
   computed: {
     dist() {
-      try {
-        return Math.round(this.map.distance(this.position, this.areaPosition))
-      } catch (error) {
-        return 0
-      }
-    },
-    direction() {
-      try {
-        let dy = this.areaPosition[0] - this.position[0]
-        let dx = this.areaPosition[1] - this.position[1]
-        let atan = Math.atan(dx / dy)
-        let a
-        if (dx >= 0 && dy >= 0) {
-          a = 2 * Math.PI - atan
-        } else if (dx <= 0 && dy >= 0) {
-          a = -atan
-        } else {
-          a = Math.PI - atan
+      if (this.sheet) {
+        try {
+          return Math.round(this.map.distance(this.position, this.areaPosition))
+        } catch (error) {
+          return 0
         }
-        this.AD = 180 * a / Math.PI
-        return -180 * a / Math.PI + this.deviceDirection - 90
-      } catch (error) {
+      } else {
         return 0
       }
     }
+    //   direction() {
+    //     if (this.sheet) {
+    //       try {
+    //         let dy = this.areaPosition[0] - this.position[0]
+    //         let dx = this.areaPosition[1] - this.position[1]
+    //         let atan = Math.atan(dx / dy)
+    //         let a
+    //         if (dx >= 0 && dy >= 0) {
+    //           a = 2 * Math.PI - atan
+    //         } else if (dx <= 0 && dy >= 0) {
+    //           a = -atan
+    //         } else {
+    //           a = Math.PI - atan
+    //         }
+    //         this.AD = 180 * a / Math.PI
+    //         return -180 * a / Math.PI + this.deviceDirection - 90
+    //       } catch (error) {
+    //         return 0
+    //       }
+    //     } else {
+    //       return 0
+    //     }
+    //   }
   },
   methods: {
     editSuccessActions() {
@@ -620,11 +628,14 @@ export default {
             firstLoc = false
           }
         })
-      if ('ondeviceorientationabsolute' in window) {
-        window.addEventListener('deviceorientationabsolute', function(eventData) {
-          vm.deviceDirection = eventData.alpha
-        })
-      }
+
+      // if ('ondeviceorientationabsolute' in window) {
+      //   window.addEventListener('deviceorientationabsolute', function(eventData) {
+      //     if (vm.sheet) {
+      //       vm.deviceDirection = eventData.alpha
+      //     }
+      //   })
+      // }
     }
 
     // Initialize Firebase
