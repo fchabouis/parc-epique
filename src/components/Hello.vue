@@ -615,12 +615,8 @@ export default {
         })
         .on('locationfound', function(evt) {
           vm.position = [evt.latitude, evt.longitude]
-          metresPerPixel =
-            40075016.686 *
-            Math.abs(Math.cos(map.getCenter().lat * 180 / Math.PI)) /
-            Math.pow(2, map.getZoom() + 8)
           accuracy = evt.accuracy
-          markerAccuracy.setRadius(accuracy / metresPerPixel)
+          markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
           markerAccuracy.setLatLng(vm.position).addTo(map)
           markerPosition.setLatLng(vm.position).addTo(map)
           if (firstLoc) {
