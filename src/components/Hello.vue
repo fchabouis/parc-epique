@@ -611,7 +611,7 @@ export default {
       map
         .on('zoomend', function() {
           metresPerPixel = cst / Math.pow(2, map.getZoom() + 8)
-          markerAccuracy.setRadius(accuracy / metresPerPixel)
+          markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
         })
         .on('locationfound', function(evt) {
           vm.position = [evt.latitude, evt.longitude]
