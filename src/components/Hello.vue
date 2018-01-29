@@ -601,7 +601,7 @@ export default {
     let markerAccuracy = L.circleMarker([], {
       stroke: false,
       color: '#0000ff',
-      fillOpacity: 0.05,
+      fillOpacity: 0.03,
       radius: 0
     })
     let firstLoc = true
