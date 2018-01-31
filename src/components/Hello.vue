@@ -5,7 +5,7 @@
 
     <v-snackbar v-model="snackbar">
       {{ snackbarMsg }}
-      <v-btn flat color="orange" @click.native="snackbar = false">fermer</v-btn>
+      <v-btn flat color="primary" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
 
     <v-dialog v-model="dialogAddArea" transition="dialog-bottom-transition" :overlay="false" max-width="290">
@@ -19,7 +19,7 @@
             <div class="">
               Un marqueur va apparaître sur la carte. Faites le glisser précisement jusqu'au bon endroit, puis cliquez dessus pour confirmer.
             </div>
-            <v-btn color="orange darken-2" dark flat @click.stop="addArea">Ok !</v-btn>
+            <v-btn color="primary" dark flat @click.stop="addArea">Ok !</v-btn>
             <v-btn color="secondary" dark flat @click.stop="dialogAddArea = false">Annuler</v-btn>
           </v-container>
         </v-card-text>
@@ -34,7 +34,7 @@
             <div class="pb-3">
               Vous êtes sur le point d'ajouter une nouvelle aire de jeux à cet endroit. Elle sera visible par tout le monde.
             </div>
-            <v-btn color="orange darken-2" dark flat @click.stop="pushArea">Oui, je le veux</v-btn>
+            <v-btn color="primary" dark flat @click.stop="pushArea">Oui, je le veux</v-btn>
             <v-btn color="secondary" dark flat @click.stop="deleteArea">Non ! La supprimer</v-btn>
             <v-btn color="secondary" dark flat @click.stop="dialogConfirmArea = false">Revenir à la carte</v-btn>
           </v-container>
@@ -44,7 +44,7 @@
 
     <v-dialog v-model="dialogEditArea" transition="dialog-bottom-transition" :overlay="false" scrollable>
       <v-card>
-        <v-toolbar style="flex: 0 0 auto;" dark class="orange darken-2">
+        <v-toolbar style="flex: 0 0 auto;" dark class="primary">
           <v-btn icon @click.native="dialogEditArea = false" dark>
             <v-icon>close</v-icon>
           </v-btn>
@@ -63,7 +63,7 @@
       <v-card style="height: 100%">
         <v-tabs v-model="tabActive" grow style="height:100%;">
 
-          <v-tabs-bar class="orange darken-1" dark>
+          <v-tabs-bar class="primary">
             <v-btn icon @click.native="sheet = false">
               <v-icon>close</v-icon>
             </v-btn>
@@ -86,13 +86,13 @@
                         <h2>
                           Cadre
                         </h2>
-                        <star-rating v-model="averageRatingSurroundings" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                        <star-rating v-model="averageRatingSurroundings" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
                       </v-flex>
                       <v-flex md6>
                         <h2>
                           Équipement
                         </h2>
-                        <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                        <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
                       </v-flex>
                     </v-layout>
                     <span v-if="dist">à {{ dist }} mètres</span>
@@ -112,7 +112,7 @@
                       </div>
                     </div>
                     <div class="text-xs-center">
-                      <v-chip v-for='equipment in equipmentsList ' color="orange darken-3" text-color="white">{{ equipment }}</v-chip>
+                      <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
                       <v-spacer></v-spacer>
                       <v-btn color="secondary" flat @click.stop="dialogEditArea=true">Ajouter des détails</v-btn>
                     </div>
@@ -141,9 +141,9 @@
                         <div class="pt-3">
                           <h4>
                             {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
-                            <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                            <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
                             Équipement
-                            <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                            <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary "></star-rating>
                           </h4>
                           <p>
                             {{ c.comment }}
@@ -174,13 +174,13 @@
                           <h2>
                             Cadre
                           </h2>
-                          <star-rating v-model="ratingSurroundings" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                          <star-rating v-model="ratingSurroundings" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
                         </v-flex>
                         <v-flex md6>
                           <h2>
                             Équipement
                           </h2>
-                          <star-rating v-model="ratingEquipment" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="'rgb(245, 124, 0)'"></star-rating>
+                          <star-rating v-model="ratingEquipment" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
                         </v-flex>
                       </v-layout>
 
@@ -190,14 +190,14 @@
                           <v-icon>add_a_photo</v-icon>
                         </v-btn>
                         <div v-for="(ts,progress) in Object.keys(uploadProgress)">
-                          <v-progress-linear color="orange" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
+                          <v-progress-linear color="primary" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
                         </div>
                       </div>
 
                       <v-text-field textarea label="Commentaire" v-model="comment"></v-text-field>
 
                       <div>
-                        <v-btn color="orange darken-2" :loading="sendingRating" @click.native="sendRating()" :disabled="sendingRating" dark>Envoyer</v-btn>
+                        <v-btn color="primary" :loading="sendingRating" @click.native="sendRating()" :disabled="sendingRating" dark>Envoyer</v-btn>
                       </div>
 
                     </v-container>
@@ -238,6 +238,7 @@ export default {
   data() {
     return {
       map: {},
+      tertiary: '',
       sheet: false,
       connected: false,
       averageRatingSurroundings: 0,
@@ -580,6 +581,7 @@ export default {
     }).setView([48.85, 2.34], 13)
 
     vm.map = map
+    vm.tertiary = this.$vuetify.theme.tertiary
 
     L.tileLayer(
       'https://api.mapbox.com/styles/v1/istopopoki/cj9ydd0jg7it52sp7pubunya6/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXN0b3BvcG9raSIsImEiOiJjaW12eWw2ZHMwMGFxdzVtMWZ5NHcwOHJ4In0.VvZvyvK0UaxbFiAtak7aVw',
@@ -667,8 +669,8 @@ export default {
     let areaCircle = L.circle([center.lat, center.lng], {
       radius: 5000,
       fillOpacity: 0,
-      color: '#f9af02',
-      opacity: 0.1,
+      color: this.$vuetify.theme.tertiary,
+      opacity: 0.2,
       weight: 10
     }).addTo(map)
 
@@ -690,6 +692,49 @@ export default {
       }
     })
 
+    const colorStrong = this.$vuetify.theme.primary
+    // const colorWeak = '#ffaa54'
+
+    const markerHtmlStylesStrong = `
+  background-color: ${colorStrong};
+  width: 2rem;
+  height: 2rem;
+  display: block;
+  left: -1rem;
+  top: -1rem;
+  position: relative;
+  border-radius: 2rem 2rem 0;
+  transform: rotate(45deg);
+  border: 1px solid #FFFFFF`
+
+    const markerHtmlStylesWeak = `
+  background-color: white;
+  width: 2rem;
+  height: 2rem;
+  display: block;
+  left: -1rem;
+  top: -1rem;
+  position: relative;
+  border-radius: 2rem 2rem 0;
+  transform: rotate(45deg);
+  border: 3px solid ${colorStrong}`
+
+    const icon1 = L.divIcon({
+      className: 'my-custom-pin',
+      iconAnchor: [0, 16],
+      labelAnchor: [-6, 0],
+      popupAnchor: [0, -36],
+      html: `<span style="${markerHtmlStylesStrong}" />`
+    })
+
+    const icon2 = L.divIcon({
+      className: 'my-custom-pin',
+      iconAnchor: [0, 16],
+      labelAnchor: [-6, 0],
+      popupAnchor: [0, -36],
+      html: `<span style="${markerHtmlStylesWeak}" />`
+    })
+
     geoQuery.on('key_entered', function(key, location, distance) {
       // vm.loadingData = true
       aires.child(key).once('value', function(snapshot) {
@@ -698,13 +743,14 @@ export default {
         // if (uidComments) {
         //   console.log(area)
         // }
-        let marker = L.circleMarker([area.lat, area.lon], {
-          stroke: false,
-          weight: 2,
-          color: 'blue',
-          fillColor: uidComments ? '#f9af02' : '#d8b56c',
-          fillOpacity: uidComments ? 0.9 : 0.4,
-          radius: 10
+        let marker = L.marker([area.lat, area.lon], {
+          icon: uidComments ? icon1 : icon2
+          // stroke: false,
+          // weight: 2,
+          // color: 'blue',
+          // fillColor: uidComments ? '#f9af02' : '#d8b56c',
+          // fillOpacity: uidComments ? 0.9 : 0.4,
+          // radius: 10
         }).on('click', function(ev) {
           stop(ev)
           vm.areaId = key

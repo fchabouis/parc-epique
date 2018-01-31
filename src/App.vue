@@ -2,7 +2,7 @@
   <v-app light>
     <v-snackbar v-model="snackbar">
       Bienvenue {{ displayName }} !
-      <v-btn flat color="orange" @click.native="snackbar = false">fermer</v-btn>
+      <v-btn flat color="primary" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
 
     <v-navigation-drawer fixed v-model="drawer" app>
@@ -61,9 +61,10 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-toolbar dense dark app class="orange darken-2">
+    <v-toolbar dense dark app class="primary">
       <v-toolbar-side-icon @click.stop="drawer = !drawer" dark></v-toolbar-side-icon>
       <v-toolbar-title v-text="title"></v-toolbar-title>
+      <img src="static/img/logo_white.png" height="25px" style="padding-left: 10px;">
       <v-spacer></v-spacer>
     </v-toolbar>
 
@@ -100,7 +101,7 @@ export default {
           title: 'Se connecter / créer un compte'
         }
       ],
-      title: 'Aires de jeux',
+      title: 'PARC-ÉPIQUE',
       connected: false,
       displayName: '',
       uid: '',
