@@ -97,7 +97,8 @@ export default {
           equipements: this.equipments,
           ouvertNuit: this.openAtNight,
           gratuit: this.freeArea,
-          prive: this.privateAccess
+          uid: this.uid,
+          timestamp: Date.now()
         }
         let areaInfos = firebase
           .database()
