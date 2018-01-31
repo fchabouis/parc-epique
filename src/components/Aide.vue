@@ -1,8 +1,23 @@
 <template>
     <div>
         <v-container style="padding: 10px;">
-            <h1 class="pt-5 pb-3">À propos</h1>
+            <h1 class="pt-5 pb-3">Les enfants ne sont pas beaucoup dehors</h1>
             <p>
+                Avez-vous entendu parler de la campagne "Dirt is good" ?
+            </p>
+            <p>
+                Une enquête menée auprès de 12 000 personnes dans 10 pays nous apprend que le temps passé par les enfants dehors est ridiculement bas. Un tiers des enfants au Royaume-Uni passe moins de 30mn par jour dehors. En moyenne un enfant passerait moins de temps dehors qu'un prisonnier.
+            </p>
+            <p>
+                C'est vrai que l'aire de jeux du coin de la rue, en tant que parent, on en a parfois assez !
+            </p>
+            <h1>Du coup...</h1>
+            <p>
+                Ce site a pour but de référencer toutes les aires de jeux de France, de nous pousser nous, les parents à sortir plus souvent, à changer de parc de temps en temps.
+            </p>
+            <h1>
+                Avec votre aide
+            </h1>       
                 Airesdejeux.org a pour but de référencer toutes les aires de jeux pour enfants de France et de permettre aux parents d'en découvrir des nouvelles.
             </p>
             <p>
