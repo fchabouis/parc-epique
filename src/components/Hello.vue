@@ -661,13 +661,17 @@ export default {
     vm.geofire = geofire
     let center = map.getCenter()
 
+    // radius for the geoquery, in meters
+
+    let radius = L.Browser.mobile ? 3000 : 5000
+
     let geoQuery = geofire.query({
       center: [center.lat, center.lng],
-      radius: 5
+      radius: radius / 1000
     })
 
     let areaCircle = L.circle([center.lat, center.lng], {
-      radius: 5000,
+      radius: radius,
       fillOpacity: 0,
       color: this.$vuetify.theme.tertiary,
       opacity: 0.2,
@@ -675,11 +679,11 @@ export default {
     }).addTo(map)
 
     map.on('moveend', function() {
-      if (map.distance(map.getCenter(), center) > 2500) {
+      if (map.distance(map.getCenter(), center) > radius * 0.66) {
         center = map.getCenter()
         geoQuery.updateCriteria({
           center: [center.lat, center.lng],
-          radius: 5
+          radius: radius / 1000
         })
         areaCircle.setLatLng([center.lat, center.lng]).addTo(map)
       }
