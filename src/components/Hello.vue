@@ -52,7 +52,7 @@
         </v-toolbar>
         <v-card-text>
           <v-container>
-            <EditArea @editSuccess="editSuccessActions" :equipmentsList="equipmentsList" :uid="uid" :connected="connected" :areaId="areaId" :openAtNightP="openAtNight" :freeAreaP="freeArea" :privateAccessP="privateAccess">
+            <EditArea @editSuccess="editSuccessActions" :dialogEditArea= "dialogEditArea" :equipmentsList="equipmentsList" :uid="uid" :connected="connected" :areaId="areaId" :openAtNightP="openAtNight" :freeAreaP="freeArea">
             </EditArea>
           </v-container>
         </v-card-text>
@@ -107,10 +107,7 @@
                       <div class="pb-1" v-if="openAtNight != undefined">
                         {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
                       </div>
-                      <div class="pb-3" v-if="privateAccess != undefined">
-                        {{ privateAccess ? 'Non accessible au public' : 'Accessible au public' }}
                       </div>
-                    </div>
                     <div class="text-xs-center">
                       <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
                       <v-spacer></v-spacer>
@@ -260,7 +257,6 @@ export default {
       equipmentsList: [],
       openAtNight: undefined,
       freeArea: undefined,
-      privateAccess: undefined,
       sendingRating: false,
       uid: '',
       displayName: '',
@@ -371,7 +367,6 @@ export default {
       vm.equipmentsList = []
       vm.openAtNight = undefined
       vm.freeArea = undefined
-      vm.privateAccess = undefined
       vm.pictures = []
 
       // work around vuetify bug with tabs slider not showing if initially hidden
@@ -399,13 +394,11 @@ export default {
             vm.equipmentsList = infos[i].equipements.slice()
             vm.openAtNight = infos[i].ouvertNuit
             vm.freeArea = infos[i].gratuit
-            vm.privateAccess = infos[i].prive
           }
         } else {
           vm.equipmentsList = []
           vm.openAtNight = undefined
           vm.freeArea = undefined
-          vm.privateAccess = undefined
         }
       })
 

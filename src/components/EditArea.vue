@@ -11,7 +11,6 @@
         </div>
         <v-checkbox color="orange darken-3" label="Ouverte la nuit ?" v-model="openAtNight"></v-checkbox>
         <v-checkbox color="orange darken-3" label="Gratuite ?" v-model="freeArea"></v-checkbox>
-        <v-checkbox color="orange darken-3" label="Non accessible au public (dans une école par exemple) ?" v-model="privateAccess"></v-checkbox>
 
         <v-select label="Équipement" v-bind:items="equipmentsDict" v-model="equipments" multiple chips color="orange darken-3" hint="Quels sont les équipements présents ?" persistent-hint></v-select>
       </div>
@@ -36,7 +35,6 @@ export default {
       equipments: [],
       openAtNight: this.openAtNightP || false,
       freeArea: this.freeAreaP || false,
-      privateAccess: this.privateAccessP || false,
       deleteArea: false,
       deleteReason: '',
       equipmentsDict: [
@@ -60,20 +58,23 @@ export default {
     freeAreaP() {
       this.freeArea = this.freeAreaP || false
     },
-    privateAccessP() {
-      this.privateAccess = this.privateAccessP || false
-    },
     equipmentsList() {
       this.equipments = this.equipmentsList.slice()
+    },
+    dialogEditArea() {
+      if (!this.dialogEditArea) {
+        this.deleteArea = false
+        this.deleteReason = ''
+      }
     }
   },
   props: [
+    'dialogEditArea',
     'equipmentsList',
     'uid',
     'areaId',
     'openAtNightP',
     'freeAreaP',
-    'privateAccessP',
     'connected'
   ],
   methods: {
