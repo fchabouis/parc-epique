@@ -70,9 +70,9 @@
             <v-tabs-item v-for="tab in tabs" :key="tab" :id="'tabTitle_' + tab" :href="'#' + tab" ripple>
               {{ tab }}
             </v-tabs-item>
-            <v-btn flat @click.native="seeMore = true">
+            <!-- <v-btn flat @click.native="seeMore = true">
               <v-icon>keyboard_arrow_up</v-icon>
-            </v-btn>
+            </v-btn> -->
             <v-tabs-slider color="black"></v-tabs-slider>
           </v-tabs-bar>
           <v-tabs-items style="height: calc(100% - 48px); overflow: auto;">
@@ -803,6 +803,10 @@ export default {
   .bottom-sheet.dialog {
     height: 70%;
   }
+}
+
+.overlay {
+  display: none;
 }
 
 #cameraInput {
