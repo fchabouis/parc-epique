@@ -52,7 +52,7 @@
         </v-toolbar>
         <v-card-text>
           <v-container>
-            <EditArea @editSuccess="editSuccessActions" :dialogEditArea= "dialogEditArea" :equipmentsList="equipmentsList" :uid="uid" :connected="connected" :areaId="areaId" :openAtNightP="openAtNight" :freeAreaP="freeArea">
+            <EditArea @editSuccess="editSuccessActions" :dialogEditArea="dialogEditArea" :equipmentsList="equipmentsList" :uid="uid" :connected="connected" :areaId="areaId" :openAtNightP="openAtNight" :freeAreaP="freeArea">
             </EditArea>
           </v-container>
         </v-card-text>
@@ -107,7 +107,7 @@
                       <div class="pb-1" v-if="openAtNight != undefined">
                         {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
                       </div>
-                      </div>
+                    </div>
                     <div class="text-xs-center">
                       <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
                       <v-spacer></v-spacer>
