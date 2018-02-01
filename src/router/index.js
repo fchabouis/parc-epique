@@ -22,5 +22,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 export default new Router({
+  mode: 'history',
   routes: routes
 })
