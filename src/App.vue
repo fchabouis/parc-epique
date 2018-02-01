@@ -61,10 +61,9 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-toolbar dense dark app class="primary">
+    <v-toolbar dense dark app class="primary" style="background: url('static/img/paysage.png') bottom no-repeat; background-size: 229px 40px;">
       <v-toolbar-side-icon @click.stop="drawer = !drawer" dark></v-toolbar-side-icon>
       <v-toolbar-title v-text="title"></v-toolbar-title>
-      <img src="static/img/logo_white.png" height="25px" style="padding-left: 10px;">
       <v-spacer></v-spacer>
     </v-toolbar>
 
