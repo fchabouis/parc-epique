@@ -63,7 +63,7 @@
 
     <v-toolbar dense dark app class="primary" style="background: url('static/img/paysage.png') bottom no-repeat; background-size: 229px 40px;">
       <v-toolbar-side-icon @click.stop="drawer = !drawer" dark></v-toolbar-side-icon>
-      <v-toolbar-title v-text="title"></v-toolbar-title>
+      <v-toolbar-title style="cursor: pointer;" v-text="title" @click="home"></v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
 
@@ -108,6 +108,9 @@ export default {
     }
   },
   methods: {
+    home() {
+      this.$router.push('/')
+    },
     checkConnection() {
       let vm = this
       firebase.auth().onAuthStateChanged(
