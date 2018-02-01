@@ -187,11 +187,7 @@
                           <v-icon>add_a_photo</v-icon>
                         </v-btn>
                         <div v-for="(ts,progress) in Object.keys(uploadProgress)">
-<<<<<<< HEAD
-                          <v-progress-linear color="orange" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
-=======
                           <v-progress-linear color="primary" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
->>>>>>> ea9a427
                         </div>
                       </div>
 
