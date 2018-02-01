@@ -599,35 +599,33 @@ export default {
       fillOpacity: 0.03,
       radius: 0
     })
+
     let firstLoc = true
+    map.locate({ watch: true })
+    map
+      .on('zoomend', function() {
+        metresPerPixel = cst / Math.pow(2, map.getZoom() + 8)
+        markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
+      })
+      .on('locationfound', function(evt) {
+        vm.position = [evt.latitude, evt.longitude]
+        accuracy = evt.accuracy
+        markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
+        markerAccuracy.setLatLng(vm.position).addTo(map)
+        markerPosition.setLatLng(vm.position).addTo(map)
+        if (firstLoc) {
+          map.flyTo(vm.position, 15)
+          firstLoc = false
+        }
+      })
 
-    if (L.Browser.mobile) {
-      map.locate({ watch: true })
-      map
-        .on('zoomend', function() {
-          metresPerPixel = cst / Math.pow(2, map.getZoom() + 8)
-          markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
-        })
-        .on('locationfound', function(evt) {
-          vm.position = [evt.latitude, evt.longitude]
-          accuracy = evt.accuracy
-          markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
-          markerAccuracy.setLatLng(vm.position).addTo(map)
-          markerPosition.setLatLng(vm.position).addTo(map)
-          if (firstLoc) {
-            map.flyTo(vm.position, 15)
-            firstLoc = false
-          }
-        })
-
-      // if ('ondeviceorientationabsolute' in window) {
-      //   window.addEventListener('deviceorientationabsolute', function(eventData) {
-      //     if (vm.sheet) {
-      //       vm.deviceDirection = eventData.alpha
-      //     }
-      //   })
-      // }
-    }
+    // if ('ondeviceorientationabsolute' in window) {
+    //   window.addEventListener('deviceorientationabsolute', function(eventData) {
+    //     if (vm.sheet) {
+    //       vm.deviceDirection = eventData.alpha
+    //     }
+    //   })
+    // }
 
     // Initialize Firebase
     let config = {
