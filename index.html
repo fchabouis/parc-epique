@@ -5,7 +5,9 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  <title>airesdejeux3</title>
+  <title>Parc Épique, la carte de toutes les aires de jeux pour enfants de France</title>
+  <meta name="description" content="Trouvez les meilleures aires de jeux et parcs pour vos enfants. Avis, photos, localisation : trouvez toutes les informations utiles pour trouver  l'aire de jeux  ou le parc pour enfants idéal. Toboggan, balancoire, escalade : voyez les équipements disponibles. Disponible à Paris, Lyon, Marseille, Nantes et dans tout le reste de la France.">
+  <meta name="author" content="Francis Chabouis">
   <link rel="icon" type="image/png" href="<%= htmlWebpackPlugin.files.publicPath %>static/img/icons/favicon.ico">
   <!--[if IE]><link rel="shortcut icon" href="/static/img/icons/favicon.ico"><![endif]-->
   <!-- Add to home screen for Android and modern mobile browsers -->
@@ -25,15 +27,14 @@
           if (file.match(/\.(js|css)$/)) { %>
     <link rel="<%= chunk.initial?'preload':'prefetch' %>" href="<%= htmlWebpackPlugin.files.publicPath + file %>" as="<%= file.match(/\.css$/)?'style':'script' %>">
     <% }}} %>
-      <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet" type="text/css">
+      <link href='https://fonts.googleapis.com/css?family=Dosis|Material+Icons' rel="stylesheet" type="text/css">
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
         crossorigin="" />
-      <link href="https://fonts.googleapis.com/css?family=Dosis" rel="stylesheet">
 </head>
 
 <body>
   <noscript>
-    This is your fallback content in case JavaScript fails to load.
+    <h1>Parc Épique, la carte de toutes les aires de jeux pour enfants de France</h1>
   </noscript>
   <div id="app"></div>
   <!-- Todo: only include in production -->
