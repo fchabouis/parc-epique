@@ -14,7 +14,7 @@ let routes = [
     component: Hello
   },
   { path: '/login', component: Login, props: true },
-  { path: '/aide', component: Aide }
+  { path: '/apropos', component: Aide }
 ]
 
 if (process.env.NODE_ENV !== 'production') {
