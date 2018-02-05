@@ -1,7 +1,7 @@
 <template>
   <!-- if you want automatic padding use "layout-padding" class -->
   <v-container style="padding: 10px;">
-    <h2>Aires de jeux</h2>
+    <h2>Parc Épique</h2>
     <p>Pour participer, créez un compte. Cela prend environ 30 secondes.</p>
     <div id="firebaseui-auth-container"></div>
   </v-container>
@@ -14,6 +14,7 @@ import 'firebaseui/dist/firebaseui.css'
 
 let uiConfig = {
   signInSuccessUrl: '/',
+  signInFlow: 'popup',
   signInOptions: [
     // Leave the lines as is for the providers you want to offer your users.
     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -49,7 +50,7 @@ export default {
   //   })
   // },
   mounted () {
-    console.log('je mount')
+    // console.log('je mount')
     if (firebaseui.auth.AuthUI.getInstance()) {
       const ui = firebaseui.auth.AuthUI.getInstance()
       ui.start('#firebaseui-auth-container', uiConfig)
