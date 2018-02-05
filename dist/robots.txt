@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+SITEMAP: https://parc-epique.fr/sitemap.txt

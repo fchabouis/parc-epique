@@ -42,7 +42,7 @@
             <v-icon light>question_answer</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <router-link to="/aide">
+            <router-link to="/apropos">
               <v-list-tile-title>A propos & aide </v-list-tile-title>
             </router-link>
           </v-list-tile-content>
