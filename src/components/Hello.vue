@@ -59,7 +59,7 @@
       </v-card>
     </v-dialog>
 
-    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset max-width="50%">
+    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset>
       <v-card style="height: 100%">
         <v-tabs v-model="tabActive" grow style="height:100%;">
 
