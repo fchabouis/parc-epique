@@ -63,7 +63,7 @@
 
     <v-toolbar dense dark app class="primary" style="background: url('static/img/paysage.png') bottom no-repeat; background-size: 229px 40px;">
       <v-toolbar-side-icon @click.stop="drawer = !drawer" dark></v-toolbar-side-icon>
-      <v-toolbar-title style="cursor: pointer;" v-text="title" @click="home"></v-toolbar-title>
+      <v-toolbar-title id="toolbarTitle" style="cursor: pointer;" v-text="title" @click="home"></v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
 
@@ -173,5 +173,11 @@ body,
 
 .container {
   padding: 0;
+}
+
+@media screen and (max-width: 600px) {
+  #toolbarTitle {
+    display: none;
+  }
 }
 </style>
