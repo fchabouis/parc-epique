@@ -1,0 +1,78 @@
+{
+  "rules": {
+    // rappel: les autorisations ne peuvent qu'être plus permissives que celles des parents
+    // personne n'a le droit de lire ou écrire par défaut
+    ".read": "auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'",
+    ".write": "false",
+    "aires": {
+      "$aire": {
+        // seul l'admin peut lire
+        ".read": "auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'",
+        ".write": "false"
+      }
+    },
+    "aires_enrichies": {
+      // les utilisateurs authentifiés peuvent écrire.
+      // tout le monde peut lire.
+      "$aire": {
+        ".read": "true",
+        ".write": "auth.uid != null"
+      }
+    },
+    "aires_infos": {
+      "$aire": {
+        // tout le monde peut lire
+        // personne ne peut écrire
+        ".read": "true",
+        ".write": "false",
+        "$aire_input": {
+          // si admin, droit en écriture
+          // si utilisateur identifié, droit de création uniquement
+          ".write": "(auth.uid != null && !data.exists()) || auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'"
+        },
+      }
+    },
+    "aires_suppression": {
+      "$aire": {
+        // admin peut lire et modifier
+        // utilisateur identifié peut ajouter une nouvelle aire
+        ".read": "auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'",
+        ".write": "(auth.uid != null && !data.exists()) || auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'",
+      }
+    },
+    "comments": {
+      "$aire": {
+        // tout le monde peut lire UNE aire
+        // admin peut écrire partout
+        // un utilisateur identifié peut écrire un commentaire à son nom
+        ".read": "true",
+          "$user": {
+						".write": "(auth.uid != null && $user == auth.uid) || auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'",   
+          }      
+      }
+    },
+    "geofire": {
+      // tout le monde peut lire
+      // utilisateur identifié peut écrire dans une aire
+      ".read": "true",
+      "$aire": {
+      	".write": "auth.uid != null"
+      },
+      ".indexOn": "g"
+    },
+    "images": {
+      // tout le monde peut lire
+      // seul admin peut écrire
+      ".read": "true",
+      ".write": "auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'"
+    },
+    "nouvelle_aire": {
+      // seul admin peut lire
+      // utilisateur identifié peut créer une nouvelle aire (pas supprimer ni modifier)
+      "$aire": {
+	      ".read": "auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'",
+	      ".write": "(auth.uid != null && !data.exists()) || auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'" 
+      }
+    }
+  }
+}
