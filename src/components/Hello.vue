@@ -59,7 +59,7 @@
       </v-card>
     </v-dialog>
 
-    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset>
+    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset persistent>
       <v-card style="height: 100%">
         <v-tabs v-model="tabActive" grow style="height:100%;">
 
@@ -231,6 +231,31 @@ import StarRating from 'vue-star-rating'
 import GeoFire from 'geofire'
 import EditArea from '@/components/EditArea'
 
+function markerStyle(borderColor, fillColor) {
+  return `background-color: ${fillColor};
+  width: 2rem;
+  height: 2rem;
+  display: block;
+  left: -1rem;
+  top: -1rem;
+  position: relative;
+  border-radius: 2rem 2rem 0;
+  transform: rotate(45deg);
+  border: 3px solid ${borderColor}`
+}
+
+function getIcon(borderColor, fillColor) {
+  return L.divIcon({
+    className: 'my-custom-pin',
+    iconAnchor: [0, 16],
+    labelAnchor: [-6, 0],
+    popupAnchor: [0, -36],
+    html: `<span style="${markerStyle(borderColor, fillColor)}" />`
+  })
+}
+
+let iconSelected = getIcon('white', 'orange')
+
 export default {
   data() {
     return {
@@ -265,6 +290,7 @@ export default {
       dialogConfirmArea: false,
       newAreaLatLng: [],
       marker: {},
+      markersRef: {},
       geofire: {},
       position: [],
       areaPosition: [],
@@ -570,6 +596,16 @@ export default {
       vm.snackbar = true
     }
   },
+  watch: {
+    areaId(newId, oldId) {
+      if (oldId) {
+        let oldMarker = this.markersRef[oldId].marker
+        let oldIcon = this.markersRef[oldId].icon
+        oldMarker.setIcon(oldIcon)
+      }
+      this.markersRef[newId].marker.setIcon(iconSelected)
+    }
+  },
   mounted() {
     let vm = this
     let map = L.map('map', {
@@ -696,7 +732,6 @@ export default {
     }
 
     let markers = L.layerGroup().addTo(map)
-    let markersRef = {}
 
     let database = firebase.database()
     let aires = database.ref('aires_enrichies')
@@ -742,59 +777,17 @@ export default {
       }
     })
 
-    const colorStrong = this.$vuetify.theme.primary
-    // const colorWeak = '#ffaa54'
-
-    const markerHtmlStylesStrong = `
-  background-color: ${colorStrong};
-  width: 2rem;
-  height: 2rem;
-  display: block;
-  left: -1rem;
-  top: -1rem;
-  position: relative;
-  border-radius: 2rem 2rem 0;
-  transform: rotate(45deg);
-  border: 1px solid #FFFFFF`
-
-    const markerHtmlStylesWeak = `
-  background-color: white;
-  width: 2rem;
-  height: 2rem;
-  display: block;
-  left: -1rem;
-  top: -1rem;
-  position: relative;
-  border-radius: 2rem 2rem 0;
-  transform: rotate(45deg);
-  border: 3px solid ${colorStrong}`
-
-    const icon1 = L.divIcon({
-      className: 'my-custom-pin',
-      iconAnchor: [0, 16],
-      labelAnchor: [-6, 0],
-      popupAnchor: [0, -36],
-      html: `<span style="${markerHtmlStylesStrong}" />`
-    })
-
-    const icon2 = L.divIcon({
-      className: 'my-custom-pin',
-      iconAnchor: [0, 16],
-      labelAnchor: [-6, 0],
-      popupAnchor: [0, -36],
-      html: `<span style="${markerHtmlStylesWeak}" />`
-    })
+    let icon1 = getIcon('white', this.$vuetify.theme.primary)
+    let icon2 = getIcon(this.$vuetify.theme.primary, 'white')
 
     geoQuery.on('key_entered', function(key, location, distance) {
       // vm.loadingData = true
       aires.child(key).once('value', function(snapshot) {
         let area = snapshot.val()
         let uidComments = area.uid_comments
-        // if (uidComments) {
-        //   console.log(area)
-        // }
+        let icon = uidComments ? icon1 : icon2
         let marker = L.marker([area.lat, area.lon], {
-          icon: uidComments ? icon1 : icon2
+          icon: icon
           // stroke: false,
           // weight: 2,
           // color: 'blue',
@@ -815,14 +808,14 @@ export default {
             map.panTo(newCenter)
           }, 500)
         })
-        markersRef[key] = marker
+        vm.markersRef[key] = { marker: marker, icon: icon }
         markers.addLayer(marker)
       })
     })
 
     geoQuery.on('key_exited', function(key, location, distance) {
-      if (key in markersRef) {
-        markers.removeLayer(markersRef[key])
+      if (key in vm.markersRef) {
+        markers.removeLayer(vm.markersRef[key].marker)
       }
     })
 
