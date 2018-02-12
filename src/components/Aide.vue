@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div style="background-color:rgb(250,250,250);">
         <v-container style="padding: 10px;">
             <h1 class="pt-5 pb-3">Les enfants ne sont pas beaucoup dehors</h1>
             <p>
