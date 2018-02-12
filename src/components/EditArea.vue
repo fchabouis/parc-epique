@@ -39,14 +39,16 @@ export default {
       deleteReason: '',
       equipmentsDict: [
         'bac à sable',
-        'cheval à bascule',
-        'toboggan',
         'circuit de voitures',
+        'cheval à bascule',
         'escalade',
-        'pont de singe',
-        'cabane',
-        'table de ping-pong',
         'fontaine',
+        'pont de singe',
+        'table de ping-pong',
+        'terrain de foot',
+        'terrain de basket',
+        'terrain de pétanque',
+        'toboggan',
         'toilettes'
       ]
     }
