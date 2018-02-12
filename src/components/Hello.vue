@@ -635,8 +635,12 @@ export default {
           '<a style="text-align:center;"><i style="vertical-align:middle;" class="material-icons">my_location</i></a>'
         container.style.cursor = 'pointer'
         container.onclick = function() {
-          flyToMyPosition = true
-          map.locate({ watch: true })
+          if (vm.position.length) {
+            map.flyTo(vm.position, 15)
+          } else {
+            flyToMyPosition = true
+            map.locate({ watch: true })
+          }
         }
         return container
       }
