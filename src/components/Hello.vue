@@ -503,9 +503,12 @@ export default {
       this.dialogAddArea = false
       this.marker = L.marker(this.newAreaLatLng, { draggable: true })
         .on('click', () => {
+          this.marker.bindPopup('').openPopup()
           this.dialogConfirmArea = true
         })
         .addTo(this.map)
+
+      this.marker.bindPopup('Ajustez ma position. Puis cliquez moi dessus.').openPopup()
     },
     deleteArea() {
       this.dialogConfirmArea = false
@@ -571,7 +574,25 @@ export default {
     let vm = this
     let map = L.map('map', {
       // renderer: L.canvas()
-    }).setView([48.85, 2.34], 13)
+    })
+    let flyToMyPosition = true
+
+    if (
+      localStorage.getItem('zoom') &&
+      localStorage.getItem('lat') &&
+      localStorage.getItem('lng')
+    ) {
+      flyToMyPosition = false
+      map.setView([localStorage.lat, localStorage.lng], localStorage.zoom)
+    } else {
+      let lat = 48.85
+      let lng = 2.34
+      let zoom = 13
+      map.setView([lat, lng], zoom)
+      localStorage.zoom = zoom
+      localStorage.lat = lat
+      localStorage.lng = lng
+    }
 
     vm.map = map
     vm.tertiary = this.$vuetify.theme.tertiary
@@ -600,12 +621,34 @@ export default {
       radius: 0
     })
 
-    let firstLoc = true
+    let LocationControl = L.Control.extend({
+      options: {
+        position: 'topleft'
+      },
+      onAdd: function(map) {
+        let container = L.DomUtil.create(
+          'div',
+          'leaflet-bar leaflet-control leaflet-control-custom'
+        )
+        container.style.backgroundColor = 'white'
+        container.innerHTML =
+          '<a style="text-align:center;"><i style="vertical-align:middle;" class="material-icons">my_location</i></a>'
+        container.style.cursor = 'pointer'
+        container.onclick = function() {
+          flyToMyPosition = true
+          map.locate({ watch: true })
+        }
+        return container
+      }
+    })
+    map.addControl(new LocationControl())
     map.locate({ watch: true })
+
     map
       .on('zoomend', function() {
         metresPerPixel = cst / Math.pow(2, map.getZoom() + 8)
         markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
+        localStorage.setItem('zoom', map.getZoom())
       })
       .on('locationfound', function(evt) {
         vm.position = [evt.latitude, evt.longitude]
@@ -613,10 +656,18 @@ export default {
         markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
         markerAccuracy.setLatLng(vm.position).addTo(map)
         markerPosition.setLatLng(vm.position).addTo(map)
-        if (firstLoc) {
+        if (flyToMyPosition) {
           map.flyTo(vm.position, 15)
-          firstLoc = false
+          flyToMyPosition = false
         }
+      })
+      .on('locationerror', function(evt) {
+        vm.snackbarMsg = "Votre position n'est pas disponible"
+        vm.snackbar = true
+      })
+      .on('moveend', function(evt) {
+        localStorage.setItem('lat', map.getCenter().lat)
+        localStorage.setItem('lng', map.getCenter().lng)
       })
 
     // if ('ondeviceorientationabsolute' in window) {
