@@ -817,7 +817,9 @@ export default {
     })
 
     geoQuery.on('key_exited', function(key, location, distance) {
-      markers.removeLayer(markersRef[key])
+      if (key in markersRef) {
+        markers.removeLayer(markersRef[key])
+      }
     })
 
     vm.checkConnection()
