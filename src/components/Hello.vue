@@ -788,32 +788,34 @@ export default {
       // vm.loadingData = true
       aires.child(key).once('value', function(snapshot) {
         let area = snapshot.val()
-        let uidComments = area.uid_comments
-        let icon = uidComments ? icon1 : icon2
-        let marker = L.marker([area.lat, area.lon], {
-          icon: icon
-          // stroke: false,
-          // weight: 2,
-          // color: 'blue',
-          // fillColor: uidComments ? '#f9af02' : '#d8b56c',
-          // fillOpacity: uidComments ? 0.9 : 0.4,
-          // radius: 10
-        }).on('click', function(ev) {
-          stop(ev)
-          vm.areaId = key
-          vm.sheet = true
-          vm.areaPosition = [area.lat, area.lon]
-          vm.fetchArea()
-          let areaPoint = map.latLngToLayerPoint(vm.areaPosition, map.getZoom())
-          setTimeout(function() {
-            let bh = document.getElementsByClassName('bottom-sheet dialog')[0].clientHeight
-            areaPoint = areaPoint.add([0, bh / 2])
-            let newCenter = map.layerPointToLatLng(areaPoint, map.getZoom())
-            map.panTo(newCenter)
-          }, 500)
-        })
-        vm.markersRef[key] = { marker: marker, icon: icon }
-        markers.addLayer(marker)
+        if (area) {
+          let uidComments = area.uid_comments
+          let icon = uidComments ? icon1 : icon2
+          let marker = L.marker([area.lat, area.lon], {
+            icon: icon
+            // stroke: false,
+            // weight: 2,
+            // color: 'blue',
+            // fillColor: uidComments ? '#f9af02' : '#d8b56c',
+            // fillOpacity: uidComments ? 0.9 : 0.4,
+            // radius: 10
+          }).on('click', function(ev) {
+            stop(ev)
+            vm.areaId = key
+            vm.sheet = true
+            vm.areaPosition = [area.lat, area.lon]
+            vm.fetchArea()
+            let areaPoint = map.latLngToLayerPoint(vm.areaPosition, map.getZoom())
+            setTimeout(function() {
+              let bh = document.getElementsByClassName('bottom-sheet dialog')[0].clientHeight
+              areaPoint = areaPoint.add([0, bh / 2])
+              let newCenter = map.layerPointToLatLng(areaPoint, map.getZoom())
+              map.panTo(newCenter)
+            }, 500)
+          })
+          vm.markersRef[key] = { marker: marker, icon: icon }
+          markers.addLayer(marker)
+        }
       })
     })
 
