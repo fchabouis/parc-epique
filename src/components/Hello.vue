@@ -95,7 +95,8 @@
                         <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
                       </v-flex>
                     </v-layout>
-                    <span v-if="dist">à {{ dist }} mètres</span>
+                    <span v-if="dist">à {{ dist }} mètres </span>
+                    <span><a :href="googleMapDirections" target="_blank"><i class="material-icons">directions_run</i>Itinéraire</a></span>
                     <!-- <v-icon v-if="direction" large color="orange darken-2" :style="{transform: 'rotate(' + direction + 'deg)'}">forward</v-icon> -->
                   </v-container>
 
@@ -294,7 +295,8 @@ export default {
       geofire: {},
       position: [],
       areaPosition: [],
-      deviceDirection: 0
+      deviceDirection: 0,
+      googleMapDirections: ''
     }
   },
   components: {
@@ -402,6 +404,8 @@ export default {
         vm.averageRatingEquipment = vm.average(vm.comments, 'ratingEquipment')
         vm.tabActive = vm.comments ? vm.tabs[0] : vm.tabs[1]
       })
+
+      vm.googleMapDirections = `https://www.google.com/maps/dir/?api=1&origin=${vm.position}&destination=${vm.areaPosition}&travelmode=walking`
 
       // equipment
       let equipments = firebase
