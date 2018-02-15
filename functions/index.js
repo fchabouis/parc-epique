@@ -86,7 +86,7 @@ exports.generateThumbnail = functions.storage.object().onChange(event => {
   }).then(() => {
     console.log('The file has been downloaded to', tempLocalFile);
     // Generate a thumbnail using ImageMagick.
-    return spawn('convert', [tempLocalFile, '-thumbnail', `${THUMB_MAX_WIDTH}x${THUMB_MAX_HEIGHT}>`, tempLocalThumbFile], {capture: ['stdout', 'stderr']});
+    return spawn('convert', [tempLocalFile, '-auto-orient', '-normalize', '-thumbnail', `${THUMB_MAX_WIDTH}x${THUMB_MAX_HEIGHT}>`, tempLocalThumbFile], {capture: ['stdout', 'stderr']});
   }).then(() => {
     console.log('Thumbnail created at', tempLocalThumbFile);
     // Uploading the Thumbnail.
