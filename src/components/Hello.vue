@@ -96,7 +96,10 @@
                       </v-flex>
                     </v-layout>
                     <span v-if="dist">à {{ dist }} mètres </span>
-                    <span><a :href="googleMapDirections" target="_blank"><i class="material-icons">directions_run</i>Itinéraire</a></span>
+                    <span>
+                      <a :href="googleMapDirections" target="_blank">
+                        <i class="material-icons">directions_run</i>Itinéraire</a>
+                    </span>
                     <!-- <v-icon v-if="direction" large color="orange darken-2" :style="{transform: 'rotate(' + direction + 'deg)'}">forward</v-icon> -->
                   </v-container>
 
@@ -405,7 +408,9 @@ export default {
         vm.tabActive = vm.comments ? vm.tabs[0] : vm.tabs[1]
       })
 
-      vm.googleMapDirections = `https://www.google.com/maps/dir/?api=1&origin=${vm.position}&destination=${vm.areaPosition}&travelmode=walking`
+      vm.googleMapDirections = `https://www.google.com/maps/dir/?api=1&origin=${
+        vm.position
+      }&destination=${vm.areaPosition}&travelmode=walking`
 
       // equipment
       let equipments = firebase
