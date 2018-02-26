@@ -710,10 +710,6 @@ export default {
           flyToMyPosition = false
         }
       })
-      .on('locationerror', function(evt) {
-        vm.snackbarMsg = "Votre position n'est pas disponible"
-        vm.snackbar = true
-      })
       .on('moveend', function(evt) {
         localStorage.setItem('lat', map.getCenter().lat)
         localStorage.setItem('lng', map.getCenter().lng)
