@@ -9,15 +9,15 @@
         <div class="pb-3">
           L'aire est-elle :
         </div>
-        <v-checkbox color="orange darken-3" label="Ouverte la nuit ?" v-model="openAtNight"></v-checkbox>
-        <v-checkbox color="orange darken-3" label="Payante ?" v-model="payingArea"></v-checkbox>
+        <v-checkbox color="primary" label="Ouverte la nuit ?" v-model="openAtNight"></v-checkbox>
+        <v-checkbox color="primary" label="Payante ?" v-model="payingArea"></v-checkbox>
 
-        <v-select label="Équipement" v-bind:items="equipmentsDict" v-model="equipments" multiple chips color="orange darken-3" hint="Quels sont les équipements présents ?" persistent-hint></v-select>
+        <v-select label="Équipement" v-bind:items="equipmentsDict" v-model="equipments" multiple chips color="primary" hint="Quels sont les équipements présents ?" persistent-hint></v-select>
       </div>
       <v-checkbox class="pt-5" color="error" label="Cette aire devrait être supprimée de la carte" v-model="deleteArea"></v-checkbox>
       <v-text-field v-if="deleteArea" color="error" textarea label="Dire en quelques mots pourquoi..." v-model="deleteReason"></v-text-field>
       <div class="pt-3 text-xs-center">
-        <v-btn color="orange darken-2" dark flat @click.stop="saveAreaInfos">Enregistrer</v-btn>
+        <v-btn color="primary" dark flat @click.stop="saveAreaInfos">Enregistrer</v-btn>
       </div>
     </div>
     <div v-else>
