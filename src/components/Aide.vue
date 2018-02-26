@@ -38,7 +38,8 @@
                 Comment puis-je participer ?
             </p>
             <p>
-                Il vous faut créer un <router-link to="/login">compte</router-link>, ce qui ne prend que quelques secondes. Vous pourrez ensuite noter les aires et compléter les informations.
+                Il vous faut créer un
+                <router-link to="/login">compte</router-link>, ce qui ne prend que quelques secondes. Vous pourrez ensuite noter les aires et compléter les informations.
             </p>
             <p class="pt-4 title">
                 Est-il possible d'ajouter une aire ?
@@ -60,7 +61,19 @@
                 <a href=https://github.com/fchabouis/parc-epique target="_blank">github</a>. J'ai également écrit un article technique qui décrit la démarche et les technologies utilisées sur
                 <a href=https://medium.com/cr%C3%A9ation-dune-app-cartographique-avec-firebase-vue/cr%C3%A9ation-dune-app-cartographique-avec-firebase-vue-js-et-leaflet-868e9ea1b958 target="_blank">Medium</a>.
             </p>
+            <p class="pt-4 title">
+                Un contact ?
+            </p>
+            Pour me contacter, utilisez la page
+            <a href="https://www.facebook.com/ParcEpique/" target="_blank">Facebook</a>.
+            <p>
+            </p>
         </v-container>
+        <v-footer class="pa-3">
+            <v-container fluid class="text-xs-center">
+            <a href="https://www.facebook.com/ParcEpique/" target="_blank"><img src="static/img/icons8-facebook-48.png"></a>
+            </v-container>
+        </v-footer>
     </div>
 </template>
 
