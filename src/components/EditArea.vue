@@ -10,7 +10,7 @@
           L'aire est-elle :
         </div>
         <v-checkbox color="orange darken-3" label="Ouverte la nuit ?" v-model="openAtNight"></v-checkbox>
-        <v-checkbox color="orange darken-3" label="Gratuite ?" v-model="freeArea"></v-checkbox>
+        <v-checkbox color="orange darken-3" label="Payante ?" v-model="payingArea"></v-checkbox>
 
         <v-select label="Équipement" v-bind:items="equipmentsDict" v-model="equipments" multiple chips color="orange darken-3" hint="Quels sont les équipements présents ?" persistent-hint></v-select>
       </div>
@@ -34,7 +34,7 @@ export default {
     return {
       equipments: [],
       openAtNight: this.openAtNightP || false,
-      freeArea: this.freeAreaP || false,
+      payingArea: !this.freeAreaP || false,
       deleteArea: false,
       deleteReason: '',
       equipmentsDict: [
@@ -58,7 +58,7 @@ export default {
       this.openAtNight = this.openAtNightP || false
     },
     freeAreaP() {
-      this.freeArea = this.freeAreaP || false
+      this.payingArea = !this.freeAreaP || false
     },
     equipmentsList() {
       this.equipments = this.equipmentsList.slice()
@@ -98,7 +98,7 @@ export default {
         let infos = {
           equipements: this.equipments,
           ouvertNuit: this.openAtNight,
-          gratuit: this.freeArea,
+          gratuit: !this.payingArea,
           uid: this.uid,
           timestamp: Date.now()
         }
