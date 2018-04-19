@@ -71,7 +71,7 @@
         </v-container>
         <v-footer class="pa-3">
             <v-container fluid class="text-xs-center">
-            <a href="https://www.facebook.com/ParcEpique/" target="_blank"><img src="static/img/icons8-facebook-48.png"></a>
+                <div class="fb-share-button" data-href="https://parc-epique.fr" data-layout="button_count" data-size="small" data-mobile-iframe="true"><a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fparc-epique.fr%2F&amp;src=sdkpreparse" class="fb-xfbml-parse-ignore">Partager</a></div>
             </v-container>
         </v-footer>
     </div>
