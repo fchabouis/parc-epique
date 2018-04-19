@@ -793,7 +793,8 @@ export default {
           let uidComments = area.uid_comments
           let icon = uidComments ? icon1 : icon2
           let marker = L.marker([area.lat, area.lon], {
-            icon: icon
+            icon: icon,
+            zIndexOffset: uidComments ? 100 : 0
             // stroke: false,
             // weight: 2,
             // color: 'blue',
