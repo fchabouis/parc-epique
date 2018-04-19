@@ -422,7 +422,7 @@ export default {
         let infos = snapshot.val()
         if (infos) {
           for (let i of Object.keys(infos)) {
-            vm.equipmentsList = infos[i].equipements.slice()
+            vm.equipmentsList = 'equipements' in infos[i] ? infos[i].equipements.slice() : []
             vm.openAtNight = infos[i].ouvertNuit
             vm.freeArea = infos[i].gratuit
           }
