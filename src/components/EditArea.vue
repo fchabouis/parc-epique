@@ -7,10 +7,19 @@
         </div>
 
         <div class="pb-3">
-          L'aire est-elle :
+          La nuit l'aire est :
         </div>
-        <v-checkbox color="primary" label="Ouverte la nuit ?" v-model="openAtNight"></v-checkbox>
-        <v-checkbox color="primary" label="Payante ?" v-model="payingArea"></v-checkbox>
+        <v-radio-group v-model="openAtNight" column>
+          <v-radio color="primary" label="ouverte" value="true"></v-radio>
+          <v-radio color="primary" label="fermée" value="false"></v-radio>
+          <v-radio color="secondary" label="on ne sait pas" value="undefined"></v-radio>
+        </v-radio-group>
+        L'aire est :
+        <v-radio-group v-model="freeArea" column>
+          <v-radio color="primary" label="gratuite" value="true"></v-radio>
+          <v-radio color="primary" label="payante" value="false"></v-radio>
+          <v-radio color="secondary" label="on ne sait pas" value="undefined"></v-radio>        
+        </v-radio-group>
 
         <v-select label="Équipement" v-bind:items="equipmentsDict" v-model="equipments" multiple chips color="primary" hint="Quels sont les équipements présents ?" persistent-hint></v-select>
       </div>
@@ -33,8 +42,8 @@ export default {
   data() {
     return {
       equipments: [],
-      openAtNight: this.openAtNightP || false,
-      payingArea: !this.freeAreaP || false,
+      openAtNight: 'undefined',
+      freeArea: 'undefined',
       deleteArea: false,
       deleteReason: '',
       equipmentsDict: [
@@ -55,10 +64,10 @@ export default {
   },
   watch: {
     openAtNightP() {
-      this.openAtNight = this.openAtNightP || false
+      this.openAtNight = this.openAtNightP === undefined ? 'undefined' : this.openAtNightP.toString()
     },
     freeAreaP() {
-      this.payingArea = !this.freeAreaP || false
+      this.freeArea = this.freeAreaP === undefined ? 'undefined' : this.freeAreaP.toString()
     },
     equipmentsList() {
       this.equipments = this.equipmentsList.slice()
@@ -97,10 +106,14 @@ export default {
       } else {
         let infos = {
           equipements: this.equipments,
-          ouvertNuit: this.openAtNight,
-          gratuit: !this.payingArea,
           uid: this.uid,
           timestamp: Date.now()
+        }
+        if (this.openAtNight !== 'undefined') {
+          infos.ouvertNuit = this.openAtNight === 'true'
+        }
+        if (this.freeArea !== 'undefined') {
+          infos.gratuit = this.freeArea === 'true'
         }
         let areaInfos = firebase
           .database()
