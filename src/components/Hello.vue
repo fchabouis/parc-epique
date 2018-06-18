@@ -234,6 +234,8 @@ import * as firebase from 'firebase'
 import StarRating from 'vue-star-rating'
 import GeoFire from 'geofire'
 import EditArea from '@/components/EditArea'
+import circle from '@turf/circle'
+import mask from '@turf/mask'
 
 function markerStyle(borderColor, fillColor) {
   return `background-color: ${fillColor};
@@ -756,13 +758,20 @@ export default {
       radius: radius / 1000
     })
 
-    let areaCircle = L.circle([center.lat, center.lng], {
-      radius: radius,
-      fillOpacity: 0,
-      color: this.$vuetify.theme.tertiary,
-      opacity: 0.2,
-      weight: 10
-    }).addTo(map)
+    function getCircle(center, radius) {
+      let c = [center.lng, center.lat]
+      var options = { units: 'meters' }
+      return circle(c, radius, options)
+    }
+    function getCircleLayer() {
+      let options = {
+        fillColor: 'black',
+        fillOpacity: 0.1,
+        stroke: false
+      }
+      return L.geoJSON(mask(getCircle(center, radius), getCircle(center, 1000000)), options)
+    }
+    let areaCircle = getCircleLayer().addTo(map)
 
     map.on('moveend', function() {
       if (map.distance(map.getCenter(), center) > radius * 0.66) {
@@ -771,7 +780,8 @@ export default {
           center: [center.lat, center.lng],
           radius: radius / 1000
         })
-        areaCircle.setLatLng([center.lat, center.lng]).addTo(map)
+        areaCircle.clearLayers()
+        areaCircle = getCircleLayer().addTo(map)
       }
     })
 
