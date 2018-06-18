@@ -783,7 +783,7 @@ export default {
     })
 
     let icon1 = getIcon('white', this.$vuetify.theme.primary)
-    let icon2 = getIcon(this.$vuetify.theme.primary, 'white')
+    let icon2 = getIcon('#b6c4bd', 'white')
 
     geoQuery.on('key_entered', function(key, location, distance) {
       // vm.loadingData = true
