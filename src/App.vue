@@ -1,6 +1,6 @@
 <template>
   <v-app light>
-    <v-snackbar v-model="snackbar">
+    <v-snackbar v-model="snackbar" app>
       Bienvenue {{ displayName }} !
       <v-btn flat color="primary" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
