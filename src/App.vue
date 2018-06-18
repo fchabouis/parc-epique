@@ -67,6 +67,25 @@
       <v-spacer></v-spacer>
     </v-toolbar>
 
+    <v-dialog app v-model="welcomeDialog" max-width="500px">
+      <v-card>
+        <v-card-media src="/static/img/aire-de-jeux.jpg" height="200px">
+        </v-card-media>
+        <v-card-title primary-title>
+          <div>
+            <h3 class="headline mb-0">Bienvenue sur Parc Épique !</h3>
+            <div class="subheading">Une carte
+              <span class="strong">collaborative</span> de toutes les aires de jeux pour enfants de France.
+            </div>
+          </div>
+        </v-card-title>
+        <v-card-actions>
+          <v-btn large color="primary" @click="welcomeDialog = false">C'est parti 🚀</v-btn>
+          <v-checkbox label="Ne plus montrer" color="primary" v-model="dontShowAnyMore"></v-checkbox>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-content>
       <router-view></router-view>
     </v-content>
@@ -104,7 +123,14 @@ export default {
       connected: false,
       displayName: '',
       uid: '',
-      snackbar: false
+      snackbar: false,
+      welcomeDialog: !(localStorage.getItem('dontShowAnyMore') === 'true'),
+      dontShowAnyMore: localStorage.getItem('dontShowAnyMore') === 'true'
+    }
+  },
+  watch: {
+    dontShowAnyMore() {
+      localStorage.setItem('dontShowAnyMore', this.dontShowAnyMore)
     }
   },
   methods: {
@@ -175,5 +201,9 @@ body,
   #toolbarTitle {
     display: none;
   }
+}
+
+.strong {
+  font-weight: 600;
 }
 </style>
