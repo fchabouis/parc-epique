@@ -158,10 +158,6 @@ body,
   height: 100%;
 }
 
-.application {
-  font-family: 'Dosis', sans-serif;
-}
-
 .application--wrap {
   min-height: 100%;
 }
