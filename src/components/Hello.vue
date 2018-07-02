@@ -96,36 +96,25 @@
 
     <v-bottom-sheet v-model="sheet" id="bottomSheet" inset>
       <v-card style="height: 100%; overflow: auto;">
-
         <v-card-text>
           <template>
-            <v-container fluid grid-list-md text-xs-center>
-              <v-layout row wrap>
-                <v-flex xs1>
-                  <v-btn flat @click.native="sheet = false" color="primary">
-                    <v-icon>close</v-icon>
-                  </v-btn>
-                </v-flex>
-                <v-flex xs10>
-                  <h3 class="display-1 primary--text"></h3>
-                </v-flex>
-                <v-flex xs1>
-                </v-flex>
-              </v-layout>
-            </v-container>
+            <v-btn fab flat @click.native="sheet = false" color="primary">
+              <v-icon>close</v-icon>
+            </v-btn>
 
             <v-container grid-list-md text-xs-center>
+              <!-- <h2>Moyenne des avis</h2> -->
               <v-layout row wrap>
                 <v-flex md6>
-                  <h2>
+                  <h3>
                     Cadre
-                  </h2>
+                  </h3>
                   <star-rating v-model="averageRatingSurroundings" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
                 </v-flex>
                 <v-flex md6>
-                  <h2>
+                  <h3>
                     Équipement
-                  </h2>
+                  </h3>
                   <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
                 </v-flex>
               </v-layout>
@@ -151,27 +140,24 @@
             <v-container>
               <div class="text-xs-center">
                 <v-btn color="primary" flat @click.stop="dialogAddComment=true">Rédiger un avis</v-btn>
-                <v-divider></v-divider>
-                <div style="margin-bottom: 20px;">
-                </div>
-                <span v-if="dist">à {{ dist }}</span>
-                <span>
-                  <a :href="googleMapDirections" target="_blank">
-                    <i class="material-icons">directions_run</i>Itinéraire</a>
-                </span>
-                <div class="pb-1" v-if="freeArea != undefined">
-                  {{ freeArea ? 'Gratuite' : 'Payante' }}
-                </div>
-                <div class="pb-1" v-if="openAtNight != undefined">
-                  {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
-                </div>
               </div>
-              <div class="text-xs-center">
+            </v-container>
+
+            <v-container fluid grid-list-md text-xs-center>
+              <span v-if="dist">À {{ dist }}</span>
+              <a :href="googleMapDirections" target="_blank">
+                <i class="material-icons">directions_run</i>Itinéraire</a>
+              <div class="pb-1" v-if="freeArea != undefined">
+                {{ freeArea ? 'Gratuite' : 'Payante' }}
+              </div>
+              <div class="pb-1" v-if="openAtNight != undefined">
+                {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
+              </div>
+              <div>
                 <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" flat @click.stop="dialogEditArea=true">Suggérer une modification</v-btn>
               </div>
-
             </v-container>
 
             <v-container :grid-list-md="true">
@@ -201,7 +187,7 @@
       </v-card>
 
     </v-bottom-sheet>
-  </div>
+    </div>
 </template>
 
 <script>
