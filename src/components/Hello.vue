@@ -8,7 +8,7 @@
       <v-btn flat color="primary" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
 
-    <v-dialog v-model="dialogAddArea" transition="dialog-bottom-transition" :overlay="false" max-width="290">
+    <v-dialog v-model="dialogAddArea" transition="scale-transition" :overlay="false" max-width="290">
       <v-card>
         <v-card-title class="headline">Ajouter une aire</v-card-title>
         <v-card-text>
@@ -26,7 +26,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogConfirmArea" transition="dialog-bottom-transition" :overlay="false" max-width="290">
+    <v-dialog v-model="dialogConfirmArea" transition="scale-transition" :overlay="false" max-width="290">
       <v-card>
         <v-card-title class="headline">Enregister la nouvelle aire ?</v-card-title>
         <v-card-text>
@@ -42,7 +42,7 @@
       </v-card>
     </v-dialog>
 
-    <v-dialog v-model="dialogEditArea" transition="dialog-bottom-transition" :overlay="false" scrollable>
+    <v-dialog v-model="dialogEditArea" transition="scale-transition" :overlay="false" scrollable>
       <v-card>
         <v-toolbar style="flex: 0 0 auto;" dark class="primary">
           <v-btn icon @click.native="dialogEditArea = false" dark>
@@ -59,169 +59,145 @@
       </v-card>
     </v-dialog>
 
-    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset persistent>
-      <v-card style="height: 100%">
-        <v-tabs v-model="tabActive" grow style="height:100%;">
+    <v-dialog v-model="dialogAddComment" transition="scale-transition" :overlay="false" scrollable>
+      <v-card>
+        <v-toolbar style="flex: 0 0 auto;" dark class="primary">
+          <v-btn icon @click.native="dialogAddComment = false" dark>
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Ajouter un avis</v-toolbar-title>
+        </v-toolbar>
+        <v-card-text>
+          <v-container grid-list-md text-xs-center>
+            <v-layout row wrap>
+              <v-flex md6>
+                <h2>
+                  Cadre
+                </h2>
+                <star-rating v-model="ratingSurroundings" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
+              </v-flex>
+              <v-flex md6>
+                <h2>
+                  Équipement
+                </h2>
+                <star-rating v-model="ratingEquipment" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
+              </v-flex>
+            </v-layout>
 
-          <v-tabs-bar class="primary">
-            <v-btn icon @click.native="sheet = false">
-              <v-icon>close</v-icon>
-            </v-btn>
-            <v-tabs-item v-for="tab in tabs" :key="tab" :id="'tabTitle_' + tab" :href="'#' + tab" ripple>
-              {{ tab }}
-            </v-tabs-item>
-            <!-- <v-btn flat @click.native="seeMore = true">
-              <v-icon>keyboard_arrow_up</v-icon>
-            </v-btn> -->
-            <v-tabs-slider color="black"></v-tabs-slider>
-          </v-tabs-bar>
-          <v-tabs-items style="height: calc(100% - 48px); overflow: auto;">
+            <v-text-field v-model="comment" box multi-line label="Partagez votre expérience concernant cette aire"></v-text-field>
+            <div>
+              <v-btn flat color="primary" :loading="sendingRating" @click.native="sendRating()" :disabled="sendingRating" dark>Publier</v-btn>
+            </div>
 
-            <v-tabs-content :key="tabs[0]" :id="tabs[0]" style="height:100%;">
-              <v-card flat style="height:100%;">
-                <v-card-text>
-                  <v-container grid-list-md text-xs-center>
-                    <v-layout row wrap>
-                      <v-flex md6>
-                        <h2>
-                          Cadre
-                        </h2>
-                        <star-rating v-model="averageRatingSurroundings" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
-                      </v-flex>
-                      <v-flex md6>
-                        <h2>
-                          Équipement
-                        </h2>
-                        <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
-                      </v-flex>
-                    </v-layout>
-                    <span v-if="dist">à {{ dist }} mètres </span>
-                    <span>
-                      <a :href="googleMapDirections" target="_blank">
-                        <i class="material-icons">directions_run</i>Itinéraire</a>
-                    </span>
-                    <!-- <v-icon v-if="direction" large color="orange darken-2" :style="{transform: 'rotate(' + direction + 'deg)'}">forward</v-icon> -->
-                  </v-container>
-
-                  <v-container>
-                    <div class="text-xs-center">
-                      <div class="pb-1" v-if="freeArea != undefined">
-                        {{ freeArea ? 'Gratuite' : 'Payante' }}
-                      </div>
-                      <div class="pb-1" v-if="openAtNight != undefined">
-                        {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
-                      </div>
-                    </div>
-                    <div class="text-xs-center">
-                      <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
-                      <v-spacer></v-spacer>
-                      <v-btn color="secondary" flat @click.stop="dialogEditArea=true">Ajouter des détails</v-btn>
-                    </div>
-
-                  </v-container>
-
-                  <v-container :grid-list-md="true">
-                    <v-layout row wrap>
-                      <v-flex xs12 md4 v-for="(pic,i) in pictures" :key="i">
-                        <v-card flat tile>
-                          <v-card-media>
-                            <a :href="pic.src" target="_blank"><img :src="pic.thumb" style="width: 100%"></a>
-                          </v-card-media>
-                        </v-card>
-                      </v-flex>
-                    </v-layout>
-                  </v-container>
-
-                  <v-container>
-                    <h2>Avis des utilisateurs</h2>
-                    <div v-if="!comments">
-                      Pas encore d'avis déposé.
-                    </div>
-                    <div v-else>
-                      <div v-for="(c,i) in comments" :key="i">
-                        <div class="pt-3">
-                          <h4>
-                            {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
-                            <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
-                            Équipement
-                            <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary "></star-rating>
-                          </h4>
-                          <p>
-                            {{ c.comment }}
-                          </p>
-                          <v-divider></v-divider>
-                        </div>
-                      </div>
-                    </div>
-                    <div style="margin-bottom: 100px;">
-                    </div>
-                  </v-container>
-
-                </v-card-text>
-              </v-card>
-            </v-tabs-content>
-
-            <v-tabs-content :key="tabs[1]" :id="tabs[1]">
-              <v-card flat>
-                <v-card-text>
-                  <div v-if="connected">
-
-                    <v-container grid-list-md text-xs-center>
-                      <div v-if="!comments">
-                        Pas encore d'avis, soyez le premier à déposer le vôtre.
-                      </div>
-                      <v-layout row wrap>
-                        <v-flex md6>
-                          <h2>
-                            Cadre
-                          </h2>
-                          <star-rating v-model="ratingSurroundings" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
-                        </v-flex>
-                        <v-flex md6>
-                          <h2>
-                            Équipement
-                          </h2>
-                          <star-rating v-model="ratingEquipment" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
-                        </v-flex>
-                      </v-layout>
-
-                      <div class="text-xs-center">
-                        <input type="file" accept="image/*" id="cameraInput">
-                        <v-btn @click="takeAPhoto">photo
-                          <v-icon>add_a_photo</v-icon>
-                        </v-btn>
-                        <div v-for="(ts,progress) in Object.keys(uploadProgress)">
-                          <v-progress-linear color="primary" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
-                        </div>
-                      </div>
-
-                      <v-text-field textarea label="Commentaire" v-model="comment"></v-text-field>
-
-                      <div>
-                        <v-btn color="primary" :loading="sendingRating" @click.native="sendRating()" :disabled="sendingRating" dark>Envoyer</v-btn>
-                      </div>
-
-                    </v-container>
-                  </div>
-                  <div v-else>
-                    <v-container text-xs-center class="pt-5">
-                      <div>
-                        <router-link to="/login" :key="$route.fullPath">Connectez-vous</router-link> pour contribuer et donner votre avis.
-                      </div>
-                    </v-container>
-                  </div>
-                  <div style="margin-bottom: 100px;">
-                  </div>
-                </v-card-text>
-              </v-card>
-            </v-tabs-content>
-
-          </v-tabs-items>
-        </v-tabs>
-        <v-card-text text-center style="overflow-y: scroll;">
+          </v-container>
         </v-card-text>
+      </v-card>
+    </v-dialog>
 
-        <div style="flex: 1 1 auto;"></div>
+    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset>
+      <v-card style="height: 100%; overflow: auto;">
+
+        <v-card-text>
+          <template>
+            <v-container fluid grid-list-md text-xs-center>
+              <v-layout row wrap>
+                <v-flex xs1>
+                  <v-btn flat @click.native="sheet = false" color="primary">
+                    <v-icon>close</v-icon>
+                  </v-btn>
+                </v-flex>
+                <v-flex xs10>
+                  <h3 class="display-1 primary--text"></h3>
+                </v-flex>
+                <v-flex xs1>
+                </v-flex>
+              </v-layout>
+            </v-container>
+
+            <v-container grid-list-md text-xs-center>
+              <v-layout row wrap>
+                <v-flex md6>
+                  <h2>
+                    Cadre
+                  </h2>
+                  <star-rating v-model="averageRatingSurroundings" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
+                </v-flex>
+                <v-flex md6>
+                  <h2>
+                    Équipement
+                  </h2>
+                  <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
+                </v-flex>
+              </v-layout>
+            </v-container>
+
+            <v-container>
+              <div>
+                <div v-for="(c,i) in comments" :key="i">
+                  <div class="pt-3">
+                    <p>
+                      {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
+                      <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
+                      Équipement
+                      <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary "></star-rating>
+                      <br>
+                      <span v-if="c.comment">"{{ c.comment }}"</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </v-container>
+
+            <v-container>
+              <div class="text-xs-center">
+                <v-btn color="primary" flat @click.stop="dialogAddComment=true">Rédiger un avis</v-btn>
+                <v-divider></v-divider>
+                <div style="margin-bottom: 20px;">
+                </div>
+                <span v-if="dist">à {{ dist }}</span>
+                <span>
+                  <a :href="googleMapDirections" target="_blank">
+                    <i class="material-icons">directions_run</i>Itinéraire</a>
+                </span>
+                <div class="pb-1" v-if="freeArea != undefined">
+                  {{ freeArea ? 'Gratuite' : 'Payante' }}
+                </div>
+                <div class="pb-1" v-if="openAtNight != undefined">
+                  {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
+                </div>
+              </div>
+              <div class="text-xs-center">
+                <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" flat @click.stop="dialogEditArea=true">Suggérer une modification</v-btn>
+              </div>
+
+            </v-container>
+
+            <v-container :grid-list-md="true">
+              <v-layout row wrap>
+                <v-flex xs12 md4 v-for="(pic,i) in pictures" :key="i">
+                  <v-card flat tile>
+                    <v-card-media>
+                      <a :href="pic.src" target="_blank"><img :src="pic.thumb" style="width: 100%"></a>
+                    </v-card-media>
+                  </v-card>
+                </v-flex>
+              </v-layout>
+              <div class="text-xs-center">
+                <input type="file" accept="image/*" id="cameraInput">
+                <v-btn flat color="primary" @click="takeAPhoto">
+                  Ajouter une photo
+                  <v-icon>add_a_photo</v-icon>
+                </v-btn>
+                <div v-for="(ts,progress) in Object.keys(uploadProgress)">
+                  <v-progress-linear color="primary" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
+                </div>
+              </div>
+            </v-container>
+
+          </template>
+        </v-card-text>
       </v-card>
 
     </v-bottom-sheet>
@@ -293,6 +269,7 @@ export default {
       loadingData: false,
       dialogEditArea: false,
       dialogAddArea: false,
+      dialogAddComment: false,
       dialogConfirmArea: false,
       newAreaLatLng: [],
       marker: {},
@@ -312,7 +289,13 @@ export default {
     dist() {
       if (this.sheet) {
         try {
-          return Math.round(this.map.distance(this.position, this.areaPosition))
+          let distanceMeters = Math.round(this.map.distance(this.position, this.areaPosition))
+          if (distanceMeters < 1000) {
+            return `${distanceMeters} mètres`
+          } else {
+            let distanceKm = Math.round(distanceMeters / 10) / 100
+            return `${distanceKm} km`
+          }
         } catch (error) {
           return 0
         }
@@ -320,29 +303,6 @@ export default {
         return 0
       }
     }
-    //   direction() {
-    //     if (this.sheet) {
-    //       try {
-    //         let dy = this.areaPosition[0] - this.position[0]
-    //         let dx = this.areaPosition[1] - this.position[1]
-    //         let atan = Math.atan(dx / dy)
-    //         let a
-    //         if (dx >= 0 && dy >= 0) {
-    //           a = 2 * Math.PI - atan
-    //         } else if (dx <= 0 && dy >= 0) {
-    //           a = -atan
-    //         } else {
-    //           a = Math.PI - atan
-    //         }
-    //         this.AD = 180 * a / Math.PI
-    //         return -180 * a / Math.PI + this.deviceDirection - 90
-    //       } catch (error) {
-    //         return 0
-    //       }
-    //     } else {
-    //       return 0
-    //     }
-    //   }
   },
   methods: {
     editSuccessActions() {
@@ -397,9 +357,6 @@ export default {
       vm.openAtNight = undefined
       vm.freeArea = undefined
       vm.pictures = []
-
-      // work around vuetify bug with tabs slider not showing if initially hidden
-      document.getElementById('tabTitle_' + vm.tabs[0]).firstChild.click()
 
       // average rating
       let comments = firebase.database().ref('/comments/' + vm.areaId)
@@ -504,6 +461,7 @@ export default {
     sendRating() {
       let vm = this
       this.sendingRating = true
+      vm.dialogAddComment = false
       firebase
         .database()
         .ref('/comments/' + vm.areaId + '/' + vm.uid)
