@@ -8,6 +8,32 @@
       <v-btn flat color="primary" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
 
+    <v-dialog v-model="askForSignIn" transition="scale-transition" :overlay="false" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Petite question 🙈</v-card-title>
+        <v-card-text>
+          <v-container>
+            <p>
+              Votre contribution en tant qu'
+              <strong>utilisateur anonyme</strong> est enregistrée. Merci !
+            </p>
+            <p>
+              Ça vous dit de vous
+              <strong>enregistrer</strong> pour que vos contributions portent votre nom ?
+            </p>
+            <p>
+              C'est trèèès rapide 🚀
+            </p>
+            <router-link to="/login">
+              <v-btn color="primary" dark flat @click.stop="addArea">Oui</v-btn>
+            </router-link>
+            <v-btn color="secondary" dark flat @click.stop="askForSignIn = false">non</v-btn>
+
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="dialogAddArea" transition="scale-transition" :overlay="false" max-width="290">
       <v-card>
         <v-card-title class="headline">Ajouter une aire</v-card-title>
@@ -34,7 +60,7 @@
             <div class="pb-3">
               Vous êtes sur le point d'ajouter une nouvelle aire de jeux à cet endroit. Elle sera visible par tout le monde.
             </div>
-            <v-btn color="primary" dark flat @click.stop="pushArea">Oui, je le veux</v-btn>
+            <v-btn color="primary" dark flat @click.stop="authenticateAndCallback(pushArea)">Oui, je le veux</v-btn>
             <v-btn color="secondary" dark flat @click.stop="deleteArea">Non ! La supprimer</v-btn>
             <v-btn color="secondary" dark flat @click.stop="dialogConfirmArea = false">Revenir à la carte</v-btn>
           </v-container>
@@ -52,7 +78,7 @@
         </v-toolbar>
         <v-card-text>
           <v-container>
-            <EditArea @editSuccess="editSuccessActions" :dialogEditArea="dialogEditArea" :equipmentsList="equipmentsList" :uid="uid" :connected="connected" :areaId="areaId" :openAtNightP="openAtNight" :freeAreaP="freeArea">
+            <EditArea @editSuccess="editSuccessActions" @askForSignInMsg="askForSignIn=true" :dialogEditArea="dialogEditArea" :equipmentsList="equipmentsList" :uid="uid" :connected="connected" :areaId="areaId" :openAtNightP="openAtNight" :freeAreaP="freeArea">
             </EditArea>
           </v-container>
         </v-card-text>
@@ -86,7 +112,7 @@
 
             <v-text-field v-model="comment" box multi-line label="Partagez votre expérience concernant cette aire"></v-text-field>
             <div>
-              <v-btn flat color="primary" :loading="sendingRating" @click.native="sendRating()" :disabled="sendingRating" dark>Publier</v-btn>
+              <v-btn flat color="primary" :loading="sendingRating" @click.native="authenticateAndCallback(sendRating)" :disabled="sendingRating" dark>Publier</v-btn>
             </div>
 
           </v-container>
@@ -145,19 +171,25 @@
 
             <v-container fluid grid-list-md text-xs-center>
               <span v-if="dist">À {{ dist }}</span>
-              <a :href="googleMapDirections" target="_blank">
-                <i class="material-icons">directions_run</i>Itinéraire</a>
-              <div class="pb-1" v-if="freeArea != undefined">
-                {{ freeArea ? 'Gratuite' : 'Payante' }}
+              <span class='display-1'>🕺</span>
+              <a :href="googleMapDirections" target="_blank">Itinéraire</a>
+              <div v-if="freeArea === undefined && openAtNight === undefined && equipmentsList.length === 0">
+                <span class='display-1'>🙈🙉🙊</span>
+                <br> La description de cette aire est inconnue pour le moment
               </div>
-              <div class="pb-1" v-if="openAtNight != undefined">
-                {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
+              <div v-else>
+                <div class="pb-1" v-if="freeArea != undefined">
+                  {{ freeArea ? 'Gratuite' : 'Payante' }}
+                </div>
+                <div class="pb-1" v-if="openAtNight != undefined">
+                  {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
+                </div>
+                <div>
+                  <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
+                  <v-spacer></v-spacer>
+                </div>
               </div>
-              <div>
-                <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
-                <v-spacer></v-spacer>
-                <v-btn color="primary" flat @click.stop="dialogEditArea=true">Suggérer une modification</v-btn>
-              </div>
+              <v-btn color="primary" flat @click.stop="dialogEditArea=true">Suggérer une modification</v-btn>
             </v-container>
 
             <v-container :grid-list-md="true">
@@ -172,7 +204,7 @@
               </v-layout>
               <div class="text-xs-center">
                 <input type="file" accept="image/*" id="cameraInput">
-                <v-btn flat color="primary" @click="takeAPhoto">
+                <v-btn flat color="primary" @click="authenticateAndCallback(takeAPhoto)">
                   Ajouter une photo
                   <v-icon>add_a_photo</v-icon>
                 </v-btn>
@@ -187,7 +219,7 @@
       </v-card>
 
     </v-bottom-sheet>
-    </div>
+  </div>
 </template>
 
 <script>
@@ -253,6 +285,7 @@ export default {
       snackbarMsg: '',
       uploadProgress: {},
       loadingData: false,
+      askForSignIn: false,
       dialogEditArea: false,
       dialogAddArea: false,
       dialogAddComment: false,
@@ -305,7 +338,11 @@ export default {
         function(user) {
           if (user) {
             vm.connected = true
-            vm.displayName = user.displayName
+            if (user.isAnonymous) {
+              vm.displayName = 'utilisateur mystère'
+            } else {
+              vm.displayName = user.displayName
+            }
             vm.uid = user.uid
           } else {
             vm.connected = false
@@ -444,11 +481,44 @@ export default {
         }
       }
     },
+    authenticateAndCallback(callback) {
+      let vm = this
+      let currentUser = firebase.auth().currentUser
+
+      let callCB = function() {
+        let cb = callback()
+        if (cb) {
+          cb.then(() => {
+            if (currentUser.isAnonymous) {
+              vm.askForSignIn = true
+            }
+          })
+        }
+      }
+
+      if (currentUser) {
+        callCB()
+      } else {
+        firebase
+          .auth()
+          .signInAnonymously()
+          .catch(function(error) {
+            console.log(error.code)
+            console.log(error.message)
+          })
+          .then(userInfo => {
+            vm.uid = userInfo.uid
+            vm.displayName = 'utilisateur mystère'
+            callCB()
+          })
+      }
+    },
     sendRating() {
       let vm = this
       this.sendingRating = true
       vm.dialogAddComment = false
-      firebase
+
+      return firebase
         .database()
         .ref('/comments/' + vm.areaId + '/' + vm.uid)
         .update({
@@ -478,7 +548,7 @@ export default {
     },
     getDateFromTimestamp(ts) {
       let date = new Date(ts)
-      return `${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`
+      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
     },
     addArea() {
       this.dialogAddArea = false
@@ -670,17 +740,17 @@ export default {
     // }
 
     // Initialize Firebase
-    let config = {
-      apiKey: 'AIzaSyCQex4JKbyUpZHggelHR9INIIAiMetm6DQ',
-      authDomain: 'aires-de-jeux-e8525.firebaseapp.com',
-      databaseURL: 'https://aires-de-jeux-e8525.firebaseio.com',
-      projectId: 'aires-de-jeux-e8525',
-      storageBucket: 'aires-de-jeux-e8525.appspot.com',
-      messagingSenderId: '105193380802'
-    }
-    if (!firebase.apps.length) {
-      firebase.initializeApp(config)
-    }
+    // let config = {
+    //   apiKey: 'AIzaSyCQex4JKbyUpZHggelHR9INIIAiMetm6DQ',
+    //   authDomain: 'aires-de-jeux-e8525.firebaseapp.com',
+    //   databaseURL: 'https://aires-de-jeux-e8525.firebaseio.com',
+    //   projectId: 'aires-de-jeux-e8525',
+    //   storageBucket: 'aires-de-jeux-e8525.appspot.com',
+    //   messagingSenderId: '105193380802'
+    // }
+    // if (!firebase.apps.length) {
+    //   firebase.initializeApp(config)
+    // }
 
     let markers = L.layerGroup().addTo(map)
 
@@ -757,6 +827,7 @@ export default {
             // radius: 10
           }).on('click', function(ev) {
             stop(ev)
+            // console.log(key)
             vm.areaId = key
             vm.sheet = true
             vm.areaPosition = [area.lat, area.lon]

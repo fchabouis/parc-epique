@@ -1,7 +1,7 @@
 <template>
   <v-app light>
     <v-snackbar v-model="snackbar" app>
-      Bienvenue {{ displayName }} !
+      Bienvenue {{ displayName }} <span class="display-1">🤘</span>
       <v-btn flat color="primary" @click.native="snackbar = false">fermer</v-btn>
     </v-snackbar>
 
@@ -142,10 +142,10 @@ export default {
       firebase.auth().onAuthStateChanged(
         function(user) {
           if (user) {
-            vm.connected = true
-            vm.displayName = user.displayName
+            vm.connected = !user.isAnonymous
+            vm.displayName = user.isAnonymous ? 'Utilisateur anonyme' : user.displayName
             vm.uid = user.uid
-            vm.snackbar = true
+            vm.snackbar = !user.isAnonymous
           } else {
             vm.connected = false
             vm.displayName = ''

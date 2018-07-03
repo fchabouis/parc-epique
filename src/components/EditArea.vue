@@ -1,6 +1,5 @@
 <template>
   <div class="">
-    <div v-if="connected">
       <div v-if="!deleteArea">
         <div class="pt-3 pb-5 text-xs-center">
           On dirait que vous souhaitez aider la communauté à en savoir plus sur cette aire ? Vous êtes au bon endroit.
@@ -18,7 +17,7 @@
         <v-radio-group v-model="freeArea" column>
           <v-radio color="primary" label="gratuite" value="true"></v-radio>
           <v-radio color="primary" label="payante" value="false"></v-radio>
-          <v-radio color="secondary" label="on ne sait pas" value="undefined"></v-radio>        
+          <v-radio color="secondary" label="on ne sait pas" value="undefined"></v-radio>
         </v-radio-group>
 
         <v-select label="Équipement" v-bind:items="equipmentsDict" v-model="equipments" multiple chips color="primary" hint="Quels sont les équipements présents ?" persistent-hint></v-select>
@@ -26,12 +25,8 @@
       <v-checkbox class="pt-5" color="error" label="Cette aire devrait être supprimée de la carte" v-model="deleteArea"></v-checkbox>
       <v-text-field v-if="deleteArea" color="error" textarea label="Dire en quelques mots pourquoi..." v-model="deleteReason"></v-text-field>
       <div class="pt-3 text-xs-center">
-        <v-btn color="primary" dark flat @click.stop="saveAreaInfos">Enregistrer</v-btn>
+        <v-btn color="primary" dark flat @click="authenticateAndCallback(saveAreaInfos)">Enregistrer</v-btn>
       </div>
-    </div>
-    <div v-else>
-      <router-link to="/login" :key="$route.fullPath">Connectez-vous</router-link> pour contribuer.
-    </div>
   </div>
 </template>
 
@@ -64,7 +59,8 @@ export default {
   },
   watch: {
     openAtNightP() {
-      this.openAtNight = this.openAtNightP === undefined ? 'undefined' : this.openAtNightP.toString()
+      this.openAtNight =
+        this.openAtNightP === undefined ? 'undefined' : this.openAtNightP.toString()
     },
     freeAreaP() {
       this.freeArea = this.freeAreaP === undefined ? 'undefined' : this.freeAreaP.toString()
@@ -89,10 +85,36 @@ export default {
     'connected'
   ],
   methods: {
+    authenticateAndCallback(callback) {
+      let vm = this
+      let currentUser = firebase.auth().currentUser
+      if (currentUser) {
+        callback().then(() => {
+          if (currentUser.isAnonymous) {
+            vm.$emit('askForSignInMsg')
+          }
+        })
+      } else {
+        firebase
+          .auth()
+          .signInAnonymously()
+          .catch(function(error) {
+            console.log(error.code)
+            console.log(error.message)
+          })
+          .then(userInfo => {
+            vm.uid = userInfo.uid
+            vm.displayName = 'utilisateur mystère'
+            callback().then(() => {
+              vm.$emit('askForSignInMsg')
+            })
+          })
+      }
+    },
     saveAreaInfos() {
       let vm = this
       if (this.deleteArea) {
-        firebase
+        return firebase
           .database()
           .ref('/aires_suppression/' + vm.areaId)
           .set({
@@ -119,7 +141,7 @@ export default {
           .database()
           .ref('/aires_infos/' + vm.areaId)
           .push()
-        areaInfos.set(infos).then(function() {
+        return areaInfos.set(infos).then(function() {
           vm.$emit('editSuccess')
         })
       }
@@ -129,5 +151,4 @@ export default {
 </script>
 
 <style>
-
 </style>

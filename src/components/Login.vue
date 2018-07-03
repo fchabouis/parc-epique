@@ -14,6 +14,7 @@ import 'firebaseui/dist/firebaseui.css'
 
 let uiConfig = {
   signInSuccessUrl: '/',
+  // autoUpgradeAnonymousUsers: true,
   signInFlow: 'popup',
   signInOptions: [
     // Leave the lines as is for the providers you want to offer your users.
