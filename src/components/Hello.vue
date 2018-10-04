@@ -718,7 +718,9 @@ export default {
     map
       .on('zoomend', function() {
         metresPerPixel = cst / Math.pow(2, map.getZoom() + 8)
-        markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
+        if (accuracy < 1000) {
+          markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
+        }
         localStorage.setItem('zoom', map.getZoom())
       })
       .on('locationfound', function(evt) {
