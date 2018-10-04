@@ -69,8 +69,8 @@
 
     <v-dialog app v-model="welcomeDialog" max-width="500px">
       <v-card>
-        <v-card-media src="/static/img/aire-de-jeux.jpg" height="200px">
-        </v-card-media>
+        <v-img src="/static/img/aire-de-jeux.jpg" height="200px">
+        </v-img>
         <v-card-title primary-title>
           <div>
             <h3 class="headline mb-0">Bienvenue sur Parc Épique !</h3>

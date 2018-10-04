@@ -109,8 +109,8 @@
                 <star-rating v-model="ratingEquipment" inline :star-size="40" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
               </v-flex>
             </v-layout>
-
-            <v-text-field v-model="comment" box multi-line label="Partagez votre expérience concernant cette aire"></v-text-field>
+            <div class="pt-5"></div>
+            <v-textarea v-model="comment" box label="Commentaire" hint="Dites ici ce que vous avez pensé de l'aire, donnez éventuellement des infos pratiques..."></v-textarea>
             <div>
               <v-btn flat color="primary" :loading="sendingRating" @click.native="authenticateAndCallback(sendRating)" :disabled="sendingRating" dark>Publier</v-btn>
             </div>
@@ -120,8 +120,8 @@
       </v-card>
     </v-dialog>
 
-    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset>
-      <v-card style="height: 100%; overflow: auto;">
+    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset hide-overlay>
+      <v-card style="height: 100%; overflow: scroll;">
         <v-card-text>
           <template>
             <v-btn fab flat @click.native="sheet = false" color="primary">
@@ -196,9 +196,9 @@
               <v-layout row wrap>
                 <v-flex xs12 md4 v-for="(pic,i) in pictures" :key="i">
                   <v-card flat tile>
-                    <v-card-media>
+                    <v-img>
                       <a :href="pic.src" target="_blank"><img :src="pic.thumb" style="width: 100%"></a>
-                    </v-card-media>
+                    </v-img>
                   </v-card>
                 </v-flex>
               </v-layout>
@@ -462,7 +462,7 @@ export default {
                 vm.$set(
                   vm.uploadProgress,
                   ts,
-                  snapshot.bytesTransferred / snapshot.totalBytes * 100
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
                 )
                 // console.log(vm.uploadProgress)
               },
@@ -667,7 +667,7 @@ export default {
     ).addTo(map)
 
     let accuracy = 0
-    let cst = 40075016.686 * Math.abs(Math.cos(map.getCenter().lat * 180 / Math.PI))
+    let cst = 40075016.686 * Math.abs(Math.cos((map.getCenter().lat * 180) / Math.PI))
     let metresPerPixel = cst / Math.pow(2, map.getZoom() + 8)
     let markerPosition = L.circleMarker([], {
       stroke: false,
@@ -819,12 +819,6 @@ export default {
           let marker = L.marker([area.lat, area.lon], {
             icon: icon,
             zIndexOffset: uidComments ? 100 : 0
-            // stroke: false,
-            // weight: 2,
-            // color: 'blue',
-            // fillColor: uidComments ? '#f9af02' : '#d8b56c',
-            // fillOpacity: uidComments ? 0.9 : 0.4,
-            // radius: 10
           }).on('click', function(ev) {
             stop(ev)
             // console.log(key)
@@ -834,7 +828,7 @@ export default {
             vm.fetchArea()
             let areaPoint = map.latLngToLayerPoint(vm.areaPosition, map.getZoom())
             setTimeout(function() {
-              let bh = document.getElementsByClassName('bottom-sheet dialog')[0].clientHeight
+              let bh = document.getElementsByClassName('v-bottom-sheet v-dialog')[0].clientHeight
               areaPoint = areaPoint.add([0, bh / 2])
               let newCenter = map.layerPointToLatLng(areaPoint, map.getZoom())
               map.panTo(newCenter)
@@ -864,7 +858,7 @@ export default {
   z-index: 0;
 }
 
-.bottom-sheet.dialog {
+.v-bottom-sheet.v-dialog {
   /* overflow: auto; */
   position: fixed;
   height: 50%;

@@ -23,7 +23,8 @@
         <v-select label="Équipement" v-bind:items="equipmentsDict" v-model="equipments" multiple chips color="primary" hint="Quels sont les équipements présents ?" persistent-hint></v-select>
       </div>
       <v-checkbox class="pt-5" color="error" label="Cette aire devrait être supprimée de la carte" v-model="deleteArea"></v-checkbox>
-      <v-text-field v-if="deleteArea" color="error" textarea label="Dire en quelques mots pourquoi..." v-model="deleteReason"></v-text-field>
+      <v-textarea v-if="deleteArea" color="error" box label="Parce que..." hint="Expliquer en quelques mots pourquoi" v-model="deleteReason"></v-textarea>
+
       <div class="pt-3 text-xs-center">
         <v-btn color="primary" dark flat @click="authenticateAndCallback(saveAreaInfos)">Enregistrer</v-btn>
       </div>
