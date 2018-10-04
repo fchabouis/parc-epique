@@ -120,7 +120,7 @@
       </v-card>
     </v-dialog>
 
-    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset hide-overlay>
+    <v-bottom-sheet v-model="sheet" id="bottomSheet" inset hide-overlay persistent>
       <v-card style="height: 100%; overflow: scroll;">
         <v-card-text>
           <template>
@@ -814,6 +814,10 @@ export default {
         vm.dialogAddArea = true
         vm.newAreaLatLng = e.latlng
       }
+    })
+    .on('click', () => {
+      vm.areaId = ''
+      vm.sheet = false
     })
 
     let icon1 = getIcon('white', this.$vuetify.theme.primary)
