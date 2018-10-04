@@ -724,7 +724,9 @@ export default {
       .on('locationfound', function(evt) {
         vm.position = [evt.latitude, evt.longitude]
         accuracy = evt.accuracy
-        markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
+        if (accuracy < 1000) {
+          markerAccuracy.setRadius(accuracy / metresPerPixel).bringToBack()
+        }
         markerAccuracy.setLatLng(vm.position).addTo(map)
         markerPosition.setLatLng(vm.position).addTo(map)
         if (flyToMyPosition) {
