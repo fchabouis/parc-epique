@@ -900,7 +900,8 @@ export default {
 hr {
   border: 0;
   height: 2px;
-  background-image: -webkit-linear-gradient(left, #ffffff, #3d996e57, #ffffff);
-  background-image: -moz-linear-gradient(left, #ffffff, #3d996e57, #ffffff);
+  background-image: -webkit-linear-gradient(left, #ffffff, rgba(61, 153, 110, 0.341), #ffffff);
+  background-image: -moz-linear-gradient(left, #ffffff, rgba(61, 153, 110, 0.341), #ffffff);
+  background-image: linear-gradient(to left, white, rgba(61, 153, 110, 0.341), white);
 }
 </style>
