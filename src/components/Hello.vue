@@ -129,8 +129,13 @@
             </v-btn>
 
             <v-container grid-list-md text-xs-center>
-              <!-- <h2>Moyenne des avis</h2> -->
-              <v-layout row wrap>
+              <div v-if="dist" class="pb-3">
+                <h3>Aire de jeux à {{ dist }} <v-icon>directions_walk</v-icon>
+                  <a :href="googleMapDirections" target="_blank">Itinéraire</a></h3>
+              </div>
+              <hr>
+              <div class="pt-3"></div>
+              <v-layout row wrap v-if="averageRatingSurroundings || averageRatingEquipment">
                 <v-flex md6>
                   <h3>
                     Cadre
@@ -144,21 +149,23 @@
                   <star-rating v-model="averageRatingEquipment" inline read-only :star-size="30" :increment="0.1" :show-rating="false" :active-color="tertiary"></star-rating>
                 </v-flex>
               </v-layout>
+              <div v-else>
+                <span class="font-italic">Pas encore de note, soyez le premier à rédiger un avis !</span>
+                <!-- <v-icon>arrow_downward</v-icon> -->
+              </div>
             </v-container>
 
             <v-container>
-              <div>
-                <div v-for="(c,i) in comments" :key="i">
-                  <div class="pt-3">
-                    <p>
-                      {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
-                      <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
-                      Équipement
-                      <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary "></star-rating>
-                      <br>
-                      <span v-if="c.comment">"{{ c.comment }}"</span>
-                    </p>
-                  </div>
+              <div v-for="(c,i) in comments" :key="i">
+                <div class="pt-3">
+                  <p>
+                    {{ c.displayName }}, le {{ getDateFromTimestamp(c.timestamp) }}<br> Cadre
+                    <star-rating v-model="c.ratingSurroundings" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary"></star-rating>
+                    Équipement
+                    <star-rating v-model="c.ratingEquipment" inline read-only :star-size="15" :increment="0.5" :show-rating="false" :active-color="tertiary "></star-rating>
+                    <br>
+                    <span v-if="c.comment">"{{ c.comment }}"</span>
+                  </p>
                 </div>
               </div>
             </v-container>
@@ -166,53 +173,52 @@
             <v-container>
               <div class="text-xs-center">
                 <v-btn color="primary" flat @click.stop="dialogAddComment=true">Rédiger un avis</v-btn>
+                <hr>
               </div>
             </v-container>
 
-            <v-container fluid grid-list-md text-xs-center>
-              <span v-if="dist">À {{ dist }}</span>
-              <span class='display-1'>🕺</span>
-              <a :href="googleMapDirections" target="_blank">Itinéraire</a>
-              <div v-if="freeArea === undefined && openAtNight === undefined && equipmentsList.length === 0">
-                <span class='display-1'>🙈🙉🙊</span>
-                <br> La description de cette aire est inconnue pour le moment
+            <v-container grid-list-md text-xs-center>
+              <div class="pt-3"></div>
+              <div v-if="freeArea === undefined && openAtNight === undefined && equipmentsList.length === 0" class="font-italic">
+                La description de cette aire est inconnue pour le moment. A vous de jouer !<br>
               </div>
-              <div v-else>
-                <div class="pb-1" v-if="freeArea != undefined">
-                  {{ freeArea ? 'Gratuite' : 'Payante' }}
+                <div v-else>
+                  <div class="pb-1" v-if="freeArea != undefined">
+                    {{ freeArea ? 'Gratuite' : 'Payante' }}
+                  </div>
+                  <div class="pb-1" v-if="openAtNight != undefined">
+                    {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
+                  </div>
+                  <div>
+                    <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
+                    <v-spacer></v-spacer>
+                  </div>
                 </div>
-                <div class="pb-1" v-if="openAtNight != undefined">
-                  {{ openAtNight ? 'Ouverte la nuit' : 'Fermée la nuit' }}
-                </div>
-                <div>
-                  <v-chip v-for='equipment in equipmentsList ' color="primary" text-color="black">{{ equipment }}</v-chip>
-                  <v-spacer></v-spacer>
-                </div>
-              </div>
-              <v-btn color="primary" flat @click.stop="dialogEditArea=true">Suggérer une modification</v-btn>
+                <v-btn color="primary" flat @click.stop="dialogEditArea=true">Suggérer une modification</v-btn>
+                <hr>
             </v-container>
 
-            <v-container :grid-list-md="true">
-              <v-layout row wrap>
-                <v-flex xs12 md4 v-for="(pic,i) in pictures" :key="i">
-                  <v-card flat tile>
-                    <v-img>
-                      <a :href="pic.src" target="_blank"><img :src="pic.thumb" style="width: 100%"></a>
-                    </v-img>
-                  </v-card>
-                </v-flex>
-              </v-layout>
-              <div class="text-xs-center">
-                <input type="file" accept="image/*" id="cameraInput">
-                <v-btn flat color="primary" @click="authenticateAndCallback(takeAPhoto)">
-                  Ajouter une photo
-                  <v-icon>add_a_photo</v-icon>
-                </v-btn>
-                <div v-for="(ts,progress) in Object.keys(uploadProgress)">
-                  <v-progress-linear color="primary" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
-                </div>
-              </div>
-            </v-container>
+                <v-container :grid-list-md="true">
+                  <v-layout row wrap>
+                    <v-flex xs12 md4 v-for="(pic,i) in pictures" :key="i">
+                      <v-card flat tile>
+                        <v-img>
+                          <a :href="pic.src" target="_blank"><img :src="pic.thumb" style="width: 100%"></a>
+                        </v-img>
+                      </v-card>
+                    </v-flex>
+                  </v-layout>
+                  <div class="text-xs-center">
+                    <input type="file" accept="image/*" id="cameraInput">
+                    <v-btn flat color="primary" @click="authenticateAndCallback(takeAPhoto)">
+                      Ajouter une photo
+                      <v-icon>add_a_photo</v-icon>
+                    </v-btn>
+                    <div v-for="(ts,progress) in Object.keys(uploadProgress)">
+                      <v-progress-linear color="primary" v-if="uploadProgress[ts]" v-bind:value="uploadProgress[ts]"></v-progress-linear>
+                    </div>
+                  </div>
+                </v-container>
 
           </template>
         </v-card-text>
@@ -881,5 +887,12 @@ export default {
   overflow: hidden;
   position: absolute;
   z-index: -1;
+}
+
+hr {
+  border: 0;
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, #ffffff, #3d996e57, #ffffff);
+  background-image: -moz-linear-gradient(left, #ffffff, #3d996e57, #ffffff);
 }
 </style>
