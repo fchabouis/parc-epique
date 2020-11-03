@@ -263,6 +263,7 @@ function getIcon(borderColor, fillColor) {
 let iconSelected = getIcon('white', 'orange')
 
 export default {
+  props: {mapStyle: String},
   data() {
     return {
       map: {},
@@ -303,7 +304,8 @@ export default {
       position: [],
       areaPosition: [],
       deviceDirection: 0,
-      googleMapDirections: ''
+      googleMapDirections: '',
+      tileLayer: {}
     }
   },
   components: {
@@ -635,6 +637,15 @@ export default {
         oldMarker.setIcon(oldIcon)
       }
       this.markersRef[newId].marker.setIcon(iconSelected)
+    },
+    mapStyle(mapStyle) {
+      this.tileLayer.removeFrom(this.map)
+      this.tileLayer = L.tileLayer(
+        mapStyle,
+        {
+          attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+        }
+      ).addTo(this.map)
     }
   },
   mounted() {
@@ -664,8 +675,8 @@ export default {
     vm.map = map
     vm.tertiary = this.$vuetify.theme.tertiary
 
-    L.tileLayer(
-      'https://api.mapbox.com/styles/v1/istopopoki/cj9ydd0jg7it52sp7pubunya6/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXN0b3BvcG9raSIsImEiOiJjaW12eWw2ZHMwMGFxdzVtMWZ5NHcwOHJ4In0.VvZvyvK0UaxbFiAtak7aVw',
+    vm.tileLayer = L.tileLayer(
+      vm.mapStyle,
       {
         attribution:
           'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'

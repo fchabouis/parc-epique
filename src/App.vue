@@ -39,6 +39,15 @@
         </div>
         <v-list-tile>
           <v-list-tile-action>
+            <v-icon light>map</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content style="cursor: pointer;">
+            <v-list-tile-title v-if="mapStyle === 'map'" @click="mapStyle = 'satelite'">Passer en vue satellite</v-list-tile-title>
+            <v-list-tile-title v-else @click="mapStyle = 'map'">Passer en vue carte</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile>
+          <v-list-tile-action>
             <v-icon light>question_answer</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
@@ -47,17 +56,6 @@
             </router-link>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile>
-          <v-list-tile-action>
-            <v-icon light>layers</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <router-link to="/">
-              <v-list-tile-title>Carte</v-list-tile-title>
-            </router-link>
-          </v-list-tile-content>
-        </v-list-tile>
-
       </v-list>
     </v-navigation-drawer>
 
@@ -87,7 +85,7 @@
     </v-dialog>
 
     <v-content>
-      <router-view></router-view>
+      <router-view :map-style="maps[mapStyle]"></router-view>
     </v-content>
 
   </v-app>
@@ -125,7 +123,10 @@ export default {
       uid: '',
       snackbar: false,
       welcomeDialog: !(localStorage.getItem('dontShowAnyMore') === 'true'),
-      dontShowAnyMore: localStorage.getItem('dontShowAnyMore') === 'true'
+      dontShowAnyMore: localStorage.getItem('dontShowAnyMore') === 'true',
+      mapStyle: 'map',
+      maps: {map: 'https://api.mapbox.com/styles/v1/istopopoki/cj9ydd0jg7it52sp7pubunya6/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXN0b3BvcG9raSIsImEiOiJjaW12eWw2ZHMwMGFxdzVtMWZ5NHcwOHJ4In0.VvZvyvK0UaxbFiAtak7aVw',
+        satelite: 'https://api.mapbox.com/styles/v1/istopopoki/ckh2i36iv11yk19rst0zr9vy7/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaXN0b3BvcG9raSIsImEiOiJjaW12eWw2ZHMwMGFxdzVtMWZ5NHcwOHJ4In0.VvZvyvK0UaxbFiAtak7aVw'}
     }
   },
   watch: {
