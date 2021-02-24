@@ -1,5 +1,5 @@
 {
-  "rules": {
+  "rule": {
     // rappel: les autorisations ne peuvent qu'être plus permissives que celles des parents
     // personne n'a le droit de lire ou écrire par défaut
     ".read": "auth.uid == 'vPwnx7MDIAV5DNXzl98hlb0PBOM2'",
