@@ -230,7 +230,9 @@
 
 <script>
 import L from 'leaflet'
-import * as firebase from 'firebase'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/database'
+import 'firebase/compat/storage'
 import StarRating from 'vue-star-rating'
 import GeoFire from 'geofire'
 import EditArea from '@/components/EditArea'
@@ -751,27 +753,6 @@ export default {
         localStorage.setItem('lat', map.getCenter().lat)
         localStorage.setItem('lng', map.getCenter().lng)
       })
-
-    // if ('ondeviceorientationabsolute' in window) {
-    //   window.addEventListener('deviceorientationabsolute', function(eventData) {
-    //     if (vm.sheet) {
-    //       vm.deviceDirection = eventData.alpha
-    //     }
-    //   })
-    // }
-
-    // Initialize Firebase
-    // let config = {
-    //   apiKey: 'AIzaSyCQex4JKbyUpZHggelHR9INIIAiMetm6DQ',
-    //   authDomain: 'aires-de-jeux-e8525.firebaseapp.com',
-    //   databaseURL: 'https://aires-de-jeux-e8525.firebaseio.com',
-    //   projectId: 'aires-de-jeux-e8525',
-    //   storageBucket: 'aires-de-jeux-e8525.appspot.com',
-    //   messagingSenderId: '105193380802'
-    // }
-    // if (!firebase.apps.length) {
-    //   firebase.initializeApp(config)
-    // }
 
     let markers = L.layerGroup().addTo(map)
 
