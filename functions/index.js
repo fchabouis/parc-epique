@@ -91,21 +91,23 @@ exports.generateThumbnail = functions.storage.object().onFinalize(async (object)
   fs.unlinkSync(tempLocalThumbFile);
 
   // Get the Signed URLs for the thumbnail and original image.
-  const config = {
-    action: 'read',
-    expires: '03-01-2500'
-  }
-  return Promise.all([
-    thumbFile.getSignedUrl(config),
-    file.getSignedUrl(config)
+  const results = await Promise.all([
+    thumbFile.getSignedUrl({
+      action: 'read',
+      expires: '03-01-2500',
+    }),
+    file.getSignedUrl({
+      action: 'read',
+      expires: '03-01-2500',
+    }),
   ]);
-  console.log('Got Signed URLs.');
+
+  functions.logger.log('Got Signed URLs.');
   const thumbResult = results[0];
   const originalResult = results[1];
   const thumbFileUrl = thumbResult[0];
   const fileUrl = originalResult[0];
   // Add the URLs to the Database
   await admin.database().ref('images/' + aire + '/' + pictureId).set({path: fileUrl, thumbnail: thumbFileUrl, verified: false, uid: uid});
-  console.log('la fonction a été appelée')
   return functions.logger.log('Thumbnail URLs saved to database.');
 });
