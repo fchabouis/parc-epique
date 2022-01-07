@@ -12,5 +12,8 @@
   },
   "storage": {
     "rules": "storage.rules"
+  },
+  "functions": {
+    "runtime": "nodejs12"
   }
 }
