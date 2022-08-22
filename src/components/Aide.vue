@@ -24,6 +24,7 @@
             <p>
                 La base initiale des aires a été extraite du projet
                 <a href="https://www.openstreetmap.org">OpenStreetMap</a>, une initiative open source et collaborative de cartographie. Il vous est possible de compléter ces informations en renseignant la liste des équipements présents, en donnant votre avis sur l'aire et en ajoutant des photos.
+                Conformément aux conditions de la licence ODbL, la base de données des aires, enrichie par le site parc-epique, est disponible au <a href="https://raw.githubusercontent.com/fchabouis/parc-epique/master/base_repartage_2022_08_22.json">téléchargement</a>.
             </p>
             <p>
                 Le site n'a pas de vocation commerciale. Il est prévu par la suite d'en faire bénéficier les mairies pour leur signaler un équipement défectueux ou leur faire parvenir vos suggestions. En participant vous aidez tout le monde&nbsp;!
@@ -38,8 +39,8 @@
                 Comment puis-je participer ?
             </p>
             <p>
-                Il vous faut créer un
-                <router-link to="/login">compte</router-link>, ce qui ne prend que quelques secondes. Vous pourrez ensuite noter les aires et compléter les informations.
+                Vous pouvez participer de manière anonyme ou bien créer un
+                <router-link to="/login">compte</router-link>, ce qui ne prend que quelques secondes. En étant connectés, vous pourrez ajouter des photos aux aires.
             </p>
             <p class="pt-4 title">
                 Est-il possible d'ajouter une aire ?
@@ -90,5 +91,4 @@ export default {
 </script>
 
 <style>
-
 </style>
