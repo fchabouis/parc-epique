@@ -37,6 +37,7 @@ const THUMB_PREFIX = 'thumb_';
  * we write the public URL to the Firebase Realtime Database.
  */
 exports.generateThumbnail = functions.storage.object().onFinalize(async (object) => {
+  // une nouvelle photo arrive
   // File and directory paths.
   console.log('changement : ' + object.name)
   const filePath = object.name;
@@ -90,23 +91,32 @@ exports.generateThumbnail = functions.storage.object().onFinalize(async (object)
   fs.unlinkSync(tempLocalFile);
   fs.unlinkSync(tempLocalThumbFile);
 
-  // Get the Signed URLs for the thumbnail and original image.
-  const results = await Promise.all([
-    thumbFile.getSignedUrl({
-      action: 'read',
-      expires: '03-01-2500',
-    }),
-    file.getSignedUrl({
-      action: 'read',
-      expires: '03-01-2500',
-    }),
-  ]);
+  // get the pubic url of the thumbnail
+  console.log('going public')
+  thumbFile.makePublic()
+  console.log(thumbFile.publicUrl())
 
-  functions.logger.log('Got Signed URLs.');
-  const thumbResult = results[0];
-  const originalResult = results[1];
-  const thumbFileUrl = thumbResult[0];
-  const fileUrl = originalResult[0];
+  file.makePublic()
+  console.log(file.publicUrl())
+
+
+  // Get the Signed URLs for the thumbnail and original image.
+  // const results = await Promise.all([
+  //   thumbFile.getSignedUrl({
+  //     action: 'read',
+  //     expires: '03-01-2500',
+  //   }),
+  //   file.getSignedUrl({
+  //     action: 'read',
+  //     expires: '03-01-2500',
+  //   }),
+  // ]);
+
+  // functions.logger.log('Got Signed URLs.');
+  // const thumbResult = results[0];
+  // const originalResult = results[1];
+  const thumbFileUrl = thumbFile.publicUrl();
+  const fileUrl = file.publicUrl();
   // Add the URLs to the Database
   await admin.database().ref('images/' + aire + '/' + pictureId).set({path: fileUrl, thumbnail: thumbFileUrl, verified: false, uid: uid});
   return functions.logger.log('Thumbnail URLs saved to database.');
