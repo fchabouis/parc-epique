@@ -63,7 +63,7 @@
     "rimraf": "^2.7.1",
     "selenium-server": "^3.141.59",
     "semver": "^5.7.1",
-    "shelljs": "^0.7.6",
+    "shelljs": "^0.8.5",
     "stylus": "^0.54.8",
     "stylus-loader": "^3.0.2",
     "sw-precache-webpack-plugin": "^0.11.5",
